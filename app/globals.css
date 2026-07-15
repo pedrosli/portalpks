@@ -47,6 +47,11 @@ body {
     @apply bg-gradient-to-r from-violet-600 to-purple-700 bg-clip-text text-transparent;
   }
 
+  .brand-font {
+    font-family: var(--font-brand);
+    letter-spacing: -0.02em;
+  }
+
   .badge-pill {
     @apply inline-flex items-center rounded-full px-3 py-1 text-xs font-semibold;
   }

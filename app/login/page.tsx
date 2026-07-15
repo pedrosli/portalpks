@@ -20,18 +20,10 @@ export default function LoginPage() {
 
       <div className="card relative flex w-full max-w-sm flex-col items-center gap-8 px-8 py-10">
         <div className="flex flex-col items-center text-center">
-          <div className="mb-4 h-24 w-24 overflow-hidden rounded-full shadow-lg shadow-violet-900/10 ring-1 ring-violet-100">
-            {/* eslint-disable-next-line @next/next/no-img-element */}
-            <img
-              src="/brand/logo.png"
-              alt="PKS Administração"
-              className="h-full w-full object-cover"
-            />
-          </div>
-          <h1 className="gradient-text text-2xl font-extrabold tracking-tight">
+          <h1 className="gradient-text brand-font text-4xl font-extrabold">
             PKS Portal
           </h1>
-          <p className="mt-2 text-sm text-neutral-500">
+          <p className="mt-3 text-sm text-neutral-500">
             Entre com o email e senha fornecidos pela imobiliária.
           </p>
         </div>

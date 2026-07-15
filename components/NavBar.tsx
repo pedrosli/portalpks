@@ -10,16 +10,8 @@ export default function NavBar({ profile }: { profile: Profile | null }) {
     <header className="sticky top-0 z-10 border-b border-violet-100 bg-white/80 backdrop-blur-md">
       <div className="mx-auto flex max-w-5xl items-center justify-between px-4 py-3">
         <div className="flex items-center gap-6">
-          <Link href="/imoveis" className="flex items-center gap-2">
-            {/* eslint-disable-next-line @next/next/no-img-element */}
-            <img
-              src="/brand/logo-small.png"
-              alt="PKS Administração"
-              className="h-8 w-8 rounded-full object-cover shadow-sm ring-1 ring-violet-100"
-            />
-            <span className="gradient-text text-lg font-extrabold tracking-tight">
-              PKS Portal
-            </span>
+          <Link href="/imoveis" className="gradient-text brand-font text-xl font-extrabold">
+            PKS Portal
           </Link>
           <nav className="flex items-center gap-1 text-sm font-medium text-neutral-600">
             <Link
