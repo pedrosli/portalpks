@@ -5,6 +5,7 @@ import { getSignedPhotoUrls } from "@/lib/supabase/photos";
 import { formatCurrency, formatDate, buildPropertySheetText } from "@/lib/format";
 import PropertyGallery from "@/components/PropertyGallery";
 import CopyButton from "@/components/CopyButton";
+import SuggestedDescription from "@/components/SuggestedDescription";
 import type { Property, PropertyPhoto } from "@/lib/types";
 
 export const dynamic = "force-dynamic";
@@ -81,6 +82,18 @@ export default async function PropertyDetailPage({
         </span>
       </div>
 
+      <div className="card flex flex-col gap-3 p-5">
+        <div className="flex items-center justify-between">
+          <h2 className="font-semibold text-neutral-900">Descrição sugerida</h2>
+          <CopyButton text={sheetText} />
+        </div>
+        <p className="text-xs text-neutral-500">
+          Selecione tudo e copie, ou use o botão acima — é só colar numa
+          conversa com o cliente.
+        </p>
+        <SuggestedDescription text={sheetText} />
+      </div>
+
       <div className="card grid grid-cols-2 gap-5 p-5 sm:grid-cols-4">
         <InfoItem label="Aluguel" value={formatCurrency(typedProperty.price)} />
         <InfoItem
@@ -113,25 +126,7 @@ export default async function PropertyDetailPage({
         />
       </div>
 
-      {typedProperty.description && (
-        <div className="card p-5">
-          <h2 className="font-semibold text-neutral-900">Descrição</h2>
-          <p className="mt-1 whitespace-pre-line text-sm text-neutral-700">
-            {typedProperty.description}
-          </p>
-        </div>
-      )}
-
-      {(typedProperty.contact_name || typedProperty.contact_phone) && (
-        <p className="text-sm text-neutral-500">
-          Contato: {[typedProperty.contact_name, typedProperty.contact_phone]
-            .filter(Boolean)
-            .join(" - ")}
-        </p>
-      )}
-
       <div className="flex flex-wrap gap-3 border-t border-neutral-200 pt-6">
-        <CopyButton text={sheetText} />
         <a
           href={`/api/properties/${typedProperty.id}/export`}
           className="btn-primary"
