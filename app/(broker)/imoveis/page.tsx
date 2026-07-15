@@ -16,7 +16,7 @@ export default async function PropertiesListPage({
 
   let query = supabase
     .from("properties")
-    .select("*, property_photos(*)")
+    .select("*, property_photos!property_photos_property_id_fkey(*)")
     .order("created_at", { ascending: false });
 
   if (q && q.trim()) {

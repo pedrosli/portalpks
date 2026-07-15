@@ -13,7 +13,7 @@ export default async function AdminPropertiesPage() {
 
   const { data: properties } = await supabase
     .from("properties")
-    .select("*, property_photos(*)")
+    .select("*, property_photos!property_photos_property_id_fkey(*)")
     .order("created_at", { ascending: false });
 
   const list = (properties ?? []) as (Property & {
