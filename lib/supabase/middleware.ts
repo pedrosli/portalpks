@@ -33,17 +33,12 @@ export async function updateSession(request: NextRequest) {
   const isAuthRoute = path === "/login";
   const isAdminRoute = path.startsWith("/admin");
 
-  if (!user && !isAuthRoute) {
+  // Only the admin area requires a login. Everything else (the broker-facing
+  // property search) is public — no account needed.
+  if (isAdminRoute && !user) {
     const url = request.nextUrl.clone();
     url.pathname = "/login";
     url.searchParams.set("next", path);
-    return NextResponse.redirect(url);
-  }
-
-  if (user && isAuthRoute) {
-    const url = request.nextUrl.clone();
-    url.pathname = "/imoveis";
-    url.search = "";
     return NextResponse.redirect(url);
   }
 
@@ -60,6 +55,13 @@ export async function updateSession(request: NextRequest) {
       url.search = "";
       return NextResponse.redirect(url);
     }
+  }
+
+  if (user && isAuthRoute) {
+    const url = request.nextUrl.clone();
+    url.pathname = "/admin/imoveis";
+    url.search = "";
+    return NextResponse.redirect(url);
   }
 
   return response;

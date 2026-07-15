@@ -17,6 +17,7 @@ export default async function PropertiesListPage({
   let query = supabase
     .from("properties")
     .select("*, property_photos!property_photos_property_id_fkey(*)")
+    .eq("status", "available")
     .order("created_at", { ascending: false });
 
   if (q && q.trim()) {
@@ -97,14 +98,8 @@ export default async function PropertiesListPage({
                   </div>
                 )}
                 <div className="pointer-events-none absolute inset-0 bg-gradient-to-t from-black/25 via-transparent to-transparent" />
-                <span
-                  className={`badge-pill absolute right-3 top-3 shadow-sm ${
-                    property.status === "available"
-                      ? "bg-emerald-500 text-white"
-                      : "bg-neutral-800 text-white"
-                  }`}
-                >
-                  {property.status === "available" ? "Disponível" : "Alugado"}
+                <span className="badge-pill absolute right-3 top-3 bg-emerald-500 text-white shadow-sm">
+                  Disponível
                 </span>
               </div>
               <div className="flex flex-col gap-1 p-4">

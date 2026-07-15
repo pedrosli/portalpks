@@ -30,17 +30,19 @@ export default function NavBar({ profile }: { profile: Profile | null }) {
             )}
           </nav>
         </div>
-        <div className="flex items-center gap-3">
-          {profile?.name && (
-            <span className="hidden text-sm text-neutral-500 sm:inline">
-              {profile.name}
+        {profile && (
+          <div className="flex items-center gap-3">
+            {profile.name && (
+              <span className="hidden text-sm text-neutral-500 sm:inline">
+                {profile.name}
+              </span>
+            )}
+            <span className="flex h-8 w-8 items-center justify-center rounded-full bg-gradient-to-br from-violet-600 to-purple-700 text-xs font-bold text-white shadow-sm shadow-violet-600/30">
+              {initial}
             </span>
-          )}
-          <span className="flex h-8 w-8 items-center justify-center rounded-full bg-gradient-to-br from-violet-600 to-purple-700 text-xs font-bold text-white shadow-sm shadow-violet-600/30">
-            {initial}
-          </span>
-          <LogoutButton />
-        </div>
+            <LogoutButton />
+          </div>
+        )}
       </div>
     </header>
   );

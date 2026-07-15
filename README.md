@@ -1,15 +1,17 @@
-# Hub de Imóveis
+# Portal PKS
 
-Catálogo interno de imóveis para corretores: busca por nome, fotos, informações
+Catálogo de imóveis para corretores: busca por nome, fotos, informações
 completas, cópia rápida de texto formatado e download de um ZIP (fotos + ficha
-em PDF) por imóvel. O lado admin permite cadastrar, editar e excluir imóveis,
-subir fotos por drag & drop, escolher a foto de capa e reordenar.
+em PDF) por imóvel. **A busca é pública — o corretor não precisa de login**,
+só vê os imóveis marcados como disponíveis. O lado admin (com login) permite
+cadastrar, editar e excluir imóveis, subir fotos por drag & drop, escolher a
+foto de capa, reordenar e marcar um imóvel como alugado (o que já o esconde
+automaticamente da busca pública).
 
 ## Stack
 
 - **Next.js** (App Router, TypeScript) + **Tailwind CSS**
-- **Supabase**: Postgres (dados), Auth (login com roles `admin`/`broker`) e
-  Storage (fotos)
+- **Supabase**: Postgres (dados), Auth (login só para `admin`) e Storage (fotos)
 - **react-dropzone**, **jszip**, **@react-pdf/renderer**
 
 ## Configuração inicial
@@ -18,11 +20,13 @@ subir fotos por drag & drop, escolher a foto de capa e reordenar.
 
 1. Crie uma conta/projeto em [supabase.com](https://supabase.com) (tem plano
    gratuito, suficiente para este volume de imóveis).
-2. No **SQL Editor** do projeto, rode o conteúdo de
-   [`supabase/migrations/0001_init.sql`](supabase/migrations/0001_init.sql).
-   Isso cria as tabelas (`profiles`, `properties`, `property_photos`), as
-   políticas de RLS (leitura para qualquer usuário logado, escrita só para
-   admin) e o bucket privado `property-photos` no Storage.
+2. No **SQL Editor** do projeto, rode nesta ordem o conteúdo de:
+   - [`supabase/migrations/0001_init.sql`](supabase/migrations/0001_init.sql) —
+     cria as tabelas (`profiles`, `properties`, `property_photos`), as
+     políticas de RLS e o bucket privado `property-photos` no Storage.
+   - [`supabase/migrations/0002_public_broker_access.sql`](supabase/migrations/0002_public_broker_access.sql) —
+     ajusta a RLS para permitir que qualquer pessoa (sem login) veja os
+     imóveis com status "disponível"; o admin continua vendo tudo.
 
 ### 2. Variáveis de ambiente
 
@@ -38,24 +42,18 @@ NEXT_PUBLIC_SUPABASE_URL=https://xxxxxxxxxxxx.supabase.co
 NEXT_PUBLIC_SUPABASE_ANON_KEY=sua-anon-key
 ```
 
-### 3. Criar os usuários (admin e corretores)
+### 3. Criar o(s) usuário(s) admin
 
-Ainda não há uma tela de "convidar usuário" — os usuários são criados direto
-pelo **Supabase Dashboard → Authentication → Users → Add user**:
+Corretores não precisam de conta. Só quem gerencia os imóveis (o admin)
+precisa de login, criado direto pelo **Supabase Dashboard → Authentication →
+Users → Add user**, com em "User Metadata":
 
-- Para um usuário **admin** (equipe que gerencia os imóveis), em "User
-  Metadata" adicione:
-  ```json
-  { "role": "admin", "name": "Nome da pessoa" }
-  ```
-- Para um **corretor**, pode deixar em branco (o padrão é `broker`) ou
-  informar:
-  ```json
-  { "role": "broker", "name": "Nome do corretor" }
-  ```
+```json
+{ "role": "admin", "name": "Nome da pessoa" }
+```
 
 Um trigger no banco (`handle_new_user`) cria automaticamente a linha
-correspondente em `profiles` com o role escolhido.
+correspondente em `profiles` com esse role.
 
 ### 4. Instalar dependências e rodar localmente
 
@@ -64,10 +62,10 @@ npm install
 npm run dev
 ```
 
-Abra [http://localhost:3000](http://localhost:3000). Você será redirecionado
-para `/login`. Entre com um usuário admin para acessar `/admin/imoveis` e
-cadastrar o primeiro imóvel (com fotos). Qualquer usuário logado (admin ou
-broker) acessa `/imoveis` para buscar e baixar.
+Abra [http://localhost:3000](http://localhost:3000) — é a página pública de
+entrada, com um botão **"Acessar imóveis"** (não precisa de login) e um link
+discreto **"Área administrativa"** que leva ao `/login`. Entre com um usuário
+admin para cadastrar imóveis em `/admin/imoveis`.
 
 ## Deploy
 
@@ -80,21 +78,22 @@ projeto.
 
 ```
 app/
-  (broker)/imoveis/            -- listagem (busca por nome) e detalhe do imóvel
-  admin/imoveis/                -- CRUD de imóveis + upload/gestão de fotos
-  login/                        -- autenticação
-  api/properties/[id]/export/   -- gera o ZIP (fotos + ficha em PDF) sob demanda
+  page.tsx                       -- página pública de entrada ("Acessar imóveis")
+  (broker)/imoveis/               -- busca pública (só disponíveis) e detalhe do imóvel
+  admin/imoveis/                 -- CRUD de imóveis + upload/gestão de fotos (requer login)
+  login/                         -- autenticação (só admin)
+  api/properties/[id]/export/    -- gera o ZIP (fotos + ficha em PDF) sob demanda
 components/                      -- componentes de UI compartilhados
 lib/
   supabase/                      -- clients (browser/server/middleware) e helpers de storage
   pdf/                            -- template da ficha em PDF
   format.ts, types.ts, auth.ts
-supabase/migrations/0001_init.sql -- schema, RLS e bucket de fotos
+supabase/migrations/
+  0001_init.sql                  -- schema, RLS e bucket de fotos
+  0002_public_broker_access.sql  -- RLS pública para imóveis disponíveis
 ```
 
 ## Próximos passos possíveis
 
-- Tela de gestão de usuários (convidar corretores/admins sem usar o Dashboard
-  do Supabase).
+- Tela de gestão de usuários admin (convidar sem usar o Dashboard do Supabase).
 - Filtros de busca além do nome (bairro, faixa de preço).
-- Identidade visual da empresa (logo, cores) — hoje o visual é neutro.

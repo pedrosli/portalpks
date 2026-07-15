@@ -24,7 +24,8 @@ export default function LoginPage() {
             Portal PKS
           </h1>
           <p className="mt-3 text-sm text-neutral-500">
-            Entre com o email e senha fornecidos pela imobiliária.
+            Área administrativa. Entre com o email e senha fornecidos pela
+            imobiliária.
           </p>
         </div>
         <Suspense>

@@ -13,14 +13,6 @@ export async function GET(
   const { id } = await params;
   const supabase = await createClient();
 
-  const {
-    data: { user },
-  } = await supabase.auth.getUser();
-
-  if (!user) {
-    return NextResponse.json({ error: "Não autenticado." }, { status: 401 });
-  }
-
   const { data: property } = await supabase
     .from("properties")
     .select("*")
