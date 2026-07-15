@@ -19,7 +19,7 @@ const poppins = Poppins({
 });
 
 export const metadata: Metadata = {
-  title: "PKS Portal",
+  title: "Portal PKS",
   description: "Catálogo de imóveis para corretores",
 };
 

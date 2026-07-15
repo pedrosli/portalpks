@@ -11,7 +11,7 @@ export default function NavBar({ profile }: { profile: Profile | null }) {
       <div className="mx-auto flex max-w-5xl items-center justify-between px-4 py-3">
         <div className="flex items-center gap-6">
           <Link href="/imoveis" className="gradient-text brand-font text-xl font-extrabold">
-            PKS Portal
+            Portal PKS
           </Link>
           <nav className="flex items-center gap-1 text-sm font-medium text-neutral-600">
             <Link
