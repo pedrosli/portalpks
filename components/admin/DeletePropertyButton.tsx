@@ -42,7 +42,7 @@ export default function DeletePropertyButton({
     <button
       onClick={handleDelete}
       disabled={loading}
-      className="text-sm text-red-600 hover:text-red-800 disabled:opacity-50"
+      className="rounded-lg px-3 py-1.5 text-sm font-medium text-red-600 transition-colors hover:bg-red-50 hover:text-red-700 disabled:opacity-50"
     >
       Excluir
     </button>

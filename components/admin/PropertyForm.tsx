@@ -134,13 +134,13 @@ export default function PropertyForm({ property }: { property?: Property | null 
   }
 
   return (
-    <form onSubmit={handleSubmit} className="flex flex-col gap-6">
+    <form onSubmit={handleSubmit} className="card flex flex-col gap-6 p-6">
       <div className="grid grid-cols-1 gap-4 sm:grid-cols-2">
         <Field label="Título / nome do imóvel" required className="sm:col-span-2">
           <input
             value={form.title}
             onChange={(e) => set("title", e.target.value)}
-            className="input"
+            className="input-field"
             placeholder='Ex: "Apto 2 quartos - Vista Mar"'
           />
         </Field>
@@ -149,7 +149,7 @@ export default function PropertyForm({ property }: { property?: Property | null 
           <input
             value={form.neighborhood}
             onChange={(e) => set("neighborhood", e.target.value)}
-            className="input"
+            className="input-field"
           />
         </Field>
 
@@ -158,7 +158,7 @@ export default function PropertyForm({ property }: { property?: Property | null 
             type="number"
             value={form.price}
             onChange={(e) => set("price", e.target.value)}
-            className="input"
+            className="input-field"
           />
         </Field>
 
@@ -167,7 +167,7 @@ export default function PropertyForm({ property }: { property?: Property | null 
             type="number"
             value={form.area_m2}
             onChange={(e) => set("area_m2", e.target.value)}
-            className="input"
+            className="input-field"
           />
         </Field>
 
@@ -175,7 +175,7 @@ export default function PropertyForm({ property }: { property?: Property | null 
           <input
             value={form.floor}
             onChange={(e) => set("floor", e.target.value)}
-            className="input"
+            className="input-field"
           />
         </Field>
 
@@ -184,7 +184,7 @@ export default function PropertyForm({ property }: { property?: Property | null 
             type="number"
             value={form.bedrooms}
             onChange={(e) => set("bedrooms", e.target.value)}
-            className="input"
+            className="input-field"
           />
         </Field>
 
@@ -193,7 +193,7 @@ export default function PropertyForm({ property }: { property?: Property | null 
             type="number"
             value={form.bathrooms}
             onChange={(e) => set("bathrooms", e.target.value)}
-            className="input"
+            className="input-field"
           />
         </Field>
 
@@ -202,7 +202,7 @@ export default function PropertyForm({ property }: { property?: Property | null 
             type="number"
             value={form.parking_spots}
             onChange={(e) => set("parking_spots", e.target.value)}
-            className="input"
+            className="input-field"
           />
         </Field>
 
@@ -211,7 +211,7 @@ export default function PropertyForm({ property }: { property?: Property | null 
             type="number"
             value={form.condo_fee}
             onChange={(e) => set("condo_fee", e.target.value)}
-            className="input"
+            className="input-field"
           />
         </Field>
 
@@ -220,7 +220,7 @@ export default function PropertyForm({ property }: { property?: Property | null 
             type="number"
             value={form.iptu}
             onChange={(e) => set("iptu", e.target.value)}
-            className="input"
+            className="input-field"
           />
         </Field>
 
@@ -229,24 +229,26 @@ export default function PropertyForm({ property }: { property?: Property | null 
             type="date"
             value={form.available_from}
             onChange={(e) => set("available_from", e.target.value)}
-            className="input"
+            className="input-field"
           />
         </Field>
 
         <div className="flex items-center gap-6 sm:col-span-2">
-          <label className="flex items-center gap-2 text-sm">
+          <label className="flex items-center gap-2 text-sm font-medium text-neutral-700">
             <input
               type="checkbox"
               checked={form.furnished}
               onChange={(e) => set("furnished", e.target.checked)}
+              className="h-4 w-4 accent-violet-600"
             />
             Mobiliado
           </label>
-          <label className="flex items-center gap-2 text-sm">
+          <label className="flex items-center gap-2 text-sm font-medium text-neutral-700">
             <input
               type="checkbox"
               checked={form.pets_allowed}
               onChange={(e) => set("pets_allowed", e.target.checked)}
+              className="h-4 w-4 accent-violet-600"
             />
             Aceita pet
           </label>
@@ -256,7 +258,7 @@ export default function PropertyForm({ property }: { property?: Property | null 
           <input
             value={form.contact_name}
             onChange={(e) => set("contact_name", e.target.value)}
-            className="input"
+            className="input-field"
           />
         </Field>
 
@@ -264,7 +266,7 @@ export default function PropertyForm({ property }: { property?: Property | null 
           <input
             value={form.contact_phone}
             onChange={(e) => set("contact_phone", e.target.value)}
-            className="input"
+            className="input-field"
           />
         </Field>
 
@@ -273,36 +275,23 @@ export default function PropertyForm({ property }: { property?: Property | null 
             value={form.description}
             onChange={(e) => set("description", e.target.value)}
             rows={5}
-            className="input"
+            className="input-field"
           />
         </Field>
       </div>
 
-      {error && <p className="text-sm text-red-600">{error}</p>}
+      {error && (
+        <p className="rounded-lg bg-red-50 px-3 py-2 text-sm text-red-700">{error}</p>
+      )}
 
-      <div className="flex items-center gap-3">
-        <button
-          type="submit"
-          disabled={saving}
-          className="rounded-md bg-violet-700 px-5 py-2 text-sm font-medium text-white hover:bg-violet-800 disabled:opacity-50"
-        >
+      <div className="flex items-center gap-3 border-t border-neutral-100 pt-5">
+        <button type="submit" disabled={saving} className="btn-primary">
           {saving ? "Salvando..." : property ? "Salvar alterações" : "Criar imóvel"}
         </button>
-        {saved && <span className="text-sm text-green-700">Salvo.</span>}
+        {saved && (
+          <span className="text-sm font-medium text-emerald-600">Salvo.</span>
+        )}
       </div>
-
-      <style jsx global>{`
-        .input {
-          border: 1px solid #d4d4d4;
-          border-radius: 0.375rem;
-          padding: 0.5rem 0.75rem;
-          font-size: 0.875rem;
-          outline: none;
-        }
-        .input:focus {
-          border-color: #7c3aed;
-        }
-      `}</style>
     </form>
   );
 }

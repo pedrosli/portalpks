@@ -43,8 +43,8 @@ export default function LoginForm() {
   }
 
   return (
-    <form onSubmit={handleSubmit} className="flex flex-col gap-4 w-full max-w-sm">
-      <div className="flex flex-col gap-1">
+    <form onSubmit={handleSubmit} className="flex w-full max-w-sm flex-col gap-5">
+      <div className="flex flex-col gap-1.5">
         <label htmlFor="email" className="text-sm font-medium text-neutral-700">
           Email
         </label>
@@ -55,11 +55,11 @@ export default function LoginForm() {
           autoComplete="email"
           value={email}
           onChange={(e) => setEmail(e.target.value)}
-          className="rounded-md border border-neutral-300 px-3 py-2 text-sm outline-none focus:border-violet-500"
+          className="input-field"
         />
       </div>
 
-      <div className="flex flex-col gap-1">
+      <div className="flex flex-col gap-1.5">
         <label htmlFor="password" className="text-sm font-medium text-neutral-700">
           Senha
         </label>
@@ -70,17 +70,15 @@ export default function LoginForm() {
           autoComplete="current-password"
           value={password}
           onChange={(e) => setPassword(e.target.value)}
-          className="rounded-md border border-neutral-300 px-3 py-2 text-sm outline-none focus:border-violet-500"
+          className="input-field"
         />
       </div>
 
-      {error && <p className="text-sm text-red-600">{error}</p>}
+      {error && (
+        <p className="rounded-lg bg-red-50 px-3 py-2 text-sm text-red-700">{error}</p>
+      )}
 
-      <button
-        type="submit"
-        disabled={loading}
-        className="mt-2 rounded-md bg-violet-700 px-4 py-2 text-sm font-medium text-white hover:bg-violet-800 disabled:opacity-50"
-      >
+      <button type="submit" disabled={loading} className="btn-primary mt-2 w-full">
         {loading ? "Entrando..." : "Entrar"}
       </button>
     </form>

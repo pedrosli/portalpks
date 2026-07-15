@@ -158,10 +158,10 @@ export default function PhotoManager({
     <div className="flex flex-col gap-4">
       <div
         {...getRootProps()}
-        className={`cursor-pointer rounded-lg border-2 border-dashed p-8 text-center text-sm transition-colors ${
+        className={`cursor-pointer rounded-2xl border-2 border-dashed p-10 text-center text-sm font-medium transition-all duration-200 ${
           isDragActive
-            ? "border-neutral-500 bg-neutral-100"
-            : "border-neutral-300 text-neutral-500"
+            ? "border-violet-500 bg-violet-50 text-violet-700"
+            : "border-violet-200 bg-violet-50/30 text-neutral-500 hover:border-violet-400 hover:bg-violet-50/60"
         }`}
       >
         <input {...getInputProps()} />
@@ -172,7 +172,9 @@ export default function PhotoManager({
           : "Arraste fotos aqui, ou clique para selecionar (várias de uma vez)"}
       </div>
 
-      {error && <p className="text-sm text-red-600">{error}</p>}
+      {error && (
+        <p className="rounded-lg bg-red-50 px-3 py-2 text-sm text-red-700">{error}</p>
+      )}
 
       {photos.length > 0 && (
         <>
@@ -188,7 +190,7 @@ export default function PhotoManager({
                 onDragStart={() => handleDragStart(index)}
                 onDragOver={handleDragOver}
                 onDrop={() => handleDrop(index)}
-                className="group relative overflow-hidden rounded-md border border-neutral-200 bg-neutral-100"
+                className="group relative overflow-hidden rounded-xl border border-neutral-200 bg-neutral-100 shadow-sm transition-shadow duration-200 hover:shadow-md"
               >
                 {photo.signedUrl ? (
                   // eslint-disable-next-line @next/next/no-img-element

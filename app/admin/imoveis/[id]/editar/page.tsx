@@ -45,14 +45,16 @@ export default async function EditPropertyPage({
   return (
     <div className="flex flex-col gap-10">
       <div>
-        <h1 className="text-xl font-semibold">Editar imóvel</h1>
+        <h1 className="text-2xl font-extrabold tracking-tight text-neutral-900">
+          Editar <span className="gradient-text">imóvel</span>
+        </h1>
         <p className="text-sm text-neutral-500">{(property as Property).title}</p>
       </div>
 
       <PropertyForm property={property as Property} />
 
-      <div className="flex flex-col gap-3 border-t border-neutral-200 pt-6">
-        <h2 className="text-lg font-medium">Fotos</h2>
+      <div className="card flex flex-col gap-4 p-6">
+        <h2 className="text-lg font-bold text-neutral-900">Fotos</h2>
         <PhotoManager
           propertyId={id}
           initialPhotos={photosWithUrls}

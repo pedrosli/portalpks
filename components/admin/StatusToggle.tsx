@@ -35,10 +35,10 @@ export default function StatusToggle({
     <button
       onClick={handleToggle}
       disabled={loading}
-      className={`rounded-full px-3 py-1 text-xs font-medium disabled:opacity-50 ${
+      className={`badge-pill shadow-sm transition-transform hover:-translate-y-0.5 disabled:opacity-50 ${
         isAvailable
-          ? "bg-green-100 text-green-800 hover:bg-green-200"
-          : "bg-neutral-200 text-neutral-700 hover:bg-neutral-300"
+          ? "bg-emerald-500 text-white hover:bg-emerald-600"
+          : "bg-neutral-800 text-white hover:bg-neutral-700"
       }`}
     >
       {isAvailable ? "Disponível" : "Alugado"}

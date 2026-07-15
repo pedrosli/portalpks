@@ -29,20 +29,26 @@ export default async function AdminPropertiesPage() {
   return (
     <div className="flex flex-col gap-6">
       <div className="flex items-center justify-between">
-        <h1 className="text-xl font-semibold">Imóveis cadastrados</h1>
-        <Link
-          href="/admin/imoveis/novo"
-          className="rounded-md bg-violet-700 px-4 py-2 text-sm font-medium text-white hover:bg-violet-800"
-        >
+        <div>
+          <h1 className="text-2xl font-extrabold tracking-tight text-neutral-900">
+            Imóveis <span className="gradient-text">cadastrados</span>
+          </h1>
+          <p className="mt-1 text-sm text-neutral-500">
+            {list.length} imóve{list.length === 1 ? "l" : "is"} no total
+          </p>
+        </div>
+        <Link href="/admin/imoveis/novo" className="btn-primary">
           + Novo imóvel
         </Link>
       </div>
 
       {list.length === 0 && (
-        <p className="text-sm text-neutral-500">Nenhum imóvel cadastrado ainda.</p>
+        <p className="rounded-xl border border-dashed border-neutral-300 bg-white/60 px-4 py-10 text-center text-sm text-neutral-500">
+          Nenhum imóvel cadastrado ainda.
+        </p>
       )}
 
-      <div className="flex flex-col divide-y divide-neutral-200 rounded-lg border border-neutral-200 bg-white">
+      <div className="flex flex-col gap-3">
         {list.map((property) => {
           const coverPhoto = property.property_photos.find(
             (ph) => ph.id === property.cover_photo_id
@@ -50,8 +56,11 @@ export default async function AdminPropertiesPage() {
           const coverUrl = coverPhoto ? signedUrls[coverPhoto.path] : undefined;
 
           return (
-            <div key={property.id} className="flex items-center gap-4 p-4">
-              <div className="h-16 w-24 shrink-0 overflow-hidden rounded-md bg-neutral-100">
+            <div
+              key={property.id}
+              className="card card-interactive flex items-center gap-4 p-4"
+            >
+              <div className="h-16 w-24 shrink-0 overflow-hidden rounded-lg bg-neutral-100">
                 {coverUrl ? (
                   // eslint-disable-next-line @next/next/no-img-element
                   <img
@@ -66,10 +75,10 @@ export default async function AdminPropertiesPage() {
                 )}
               </div>
 
-              <div className="flex-1 min-w-0">
+              <div className="min-w-0 flex-1">
                 <Link
                   href={`/admin/imoveis/${property.id}/editar`}
-                  className="font-medium hover:underline"
+                  className="font-semibold text-neutral-900 hover:text-violet-700"
                 >
                   {property.title}
                 </Link>
@@ -83,7 +92,7 @@ export default async function AdminPropertiesPage() {
 
               <Link
                 href={`/admin/imoveis/${property.id}/editar`}
-                className="text-sm text-neutral-600 hover:text-neutral-900"
+                className="btn-ghost"
               >
                 Editar
               </Link>

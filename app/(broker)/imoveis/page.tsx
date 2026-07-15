@@ -36,38 +36,41 @@ export default async function PropertiesListPage({
   const signedUrls = await getSignedPhotoUrls(supabase, coverPaths);
 
   return (
-    <div className="flex flex-col gap-6">
+    <div className="flex flex-col gap-8">
+      <div>
+        <h1 className="text-2xl font-extrabold tracking-tight text-neutral-900 sm:text-3xl">
+          Encontre o <span className="gradient-text">imóvel certo</span>
+        </h1>
+        <p className="mt-1 text-sm text-neutral-500">
+          Busque pelo nome do imóvel e leve fotos e informações em segundos.
+        </p>
+      </div>
+
       <form method="get" className="flex gap-2">
         <input
           type="text"
           name="q"
           defaultValue={q ?? ""}
           placeholder="Buscar imóvel pelo nome..."
-          className="w-full max-w-md rounded-md border border-neutral-300 px-3 py-2 text-sm outline-none focus:border-violet-500"
+          className="input-field max-w-md"
         />
-        <button
-          type="submit"
-          className="rounded-md bg-violet-700 px-4 py-2 text-sm font-medium text-white hover:bg-violet-800"
-        >
+        <button type="submit" className="btn-primary">
           Buscar
         </button>
         {q && (
-          <Link
-            href="/imoveis"
-            className="flex items-center px-2 text-sm text-neutral-500 hover:text-neutral-900"
-          >
+          <Link href="/imoveis" className="btn-ghost">
             Limpar
           </Link>
         )}
       </form>
 
       {list.length === 0 && (
-        <p className="text-sm text-neutral-500">
+        <p className="rounded-xl border border-dashed border-neutral-300 bg-white/60 px-4 py-10 text-center text-sm text-neutral-500">
           {q ? `Nenhum imóvel encontrado para "${q}".` : "Nenhum imóvel disponível."}
         </p>
       )}
 
-      <div className="grid grid-cols-1 gap-4 sm:grid-cols-2 lg:grid-cols-3">
+      <div className="grid grid-cols-1 gap-5 sm:grid-cols-2 lg:grid-cols-3">
         {list.map((property) => {
           const coverPhoto = property.property_photos.find(
             (ph) => ph.id === property.cover_photo_id
@@ -78,37 +81,40 @@ export default async function PropertiesListPage({
             <Link
               key={property.id}
               href={`/imoveis/${property.id}`}
-              className="flex flex-col overflow-hidden rounded-lg border border-neutral-200 bg-white hover:shadow-md transition-shadow"
+              className="card card-interactive group flex flex-col overflow-hidden"
             >
-              <div className="relative h-40 w-full bg-neutral-100">
+              <div className="relative h-44 w-full overflow-hidden bg-neutral-100">
                 {coverUrl ? (
                   // eslint-disable-next-line @next/next/no-img-element
                   <img
                     src={coverUrl}
                     alt={property.title}
-                    className="h-full w-full object-cover"
+                    className="h-full w-full object-cover transition-transform duration-500 group-hover:scale-110"
                   />
                 ) : (
                   <div className="flex h-full w-full items-center justify-center text-xs text-neutral-400">
                     Sem foto
                   </div>
                 )}
+                <div className="pointer-events-none absolute inset-0 bg-gradient-to-t from-black/25 via-transparent to-transparent" />
                 <span
-                  className={`absolute right-2 top-2 rounded-full px-2 py-0.5 text-xs font-medium ${
+                  className={`badge-pill absolute right-3 top-3 shadow-sm ${
                     property.status === "available"
-                      ? "bg-green-100 text-green-800"
-                      : "bg-neutral-200 text-neutral-700"
+                      ? "bg-emerald-500 text-white"
+                      : "bg-neutral-800 text-white"
                   }`}
                 >
                   {property.status === "available" ? "Disponível" : "Alugado"}
                 </span>
               </div>
-              <div className="flex flex-col gap-1 p-3">
-                <h2 className="font-medium">{property.title}</h2>
+              <div className="flex flex-col gap-1 p-4">
+                <h2 className="font-semibold text-neutral-900">{property.title}</h2>
                 <p className="text-sm text-neutral-500">
                   {property.neighborhood || "-"}
                 </p>
-                <p className="text-sm font-medium">{formatCurrency(property.price)}</p>
+                <p className="gradient-text mt-1 text-lg font-bold">
+                  {formatCurrency(property.price)}
+                </p>
               </div>
             </Link>
           );
