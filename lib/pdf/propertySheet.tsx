@@ -2,15 +2,36 @@ import { Document, Page, Text, View, StyleSheet } from "@react-pdf/renderer";
 import { formatCurrency, formatDate } from "@/lib/format";
 import type { Property } from "@/lib/types";
 
+const BRAND_COLOR = "#6d28d9";
+
 const styles = StyleSheet.create({
   page: { padding: 32, fontSize: 11, fontFamily: "Helvetica" },
-  title: { fontSize: 18, marginBottom: 4, fontFamily: "Helvetica-Bold" },
+  brandBar: {
+    backgroundColor: BRAND_COLOR,
+    marginHorizontal: -32,
+    marginTop: -32,
+    marginBottom: 20,
+    paddingHorizontal: 32,
+    paddingVertical: 10,
+  },
+  brandText: {
+    color: "#ffffff",
+    fontSize: 12,
+    fontFamily: "Helvetica-Bold",
+    letterSpacing: 1,
+  },
+  title: { fontSize: 18, marginBottom: 4, fontFamily: "Helvetica-Bold", color: BRAND_COLOR },
   subtitle: { fontSize: 12, color: "#525252", marginBottom: 16 },
   grid: { flexDirection: "row", flexWrap: "wrap", marginBottom: 16 },
   cell: { width: "50%", marginBottom: 8 },
   label: { fontSize: 9, color: "#737373" },
   value: { fontSize: 12, fontFamily: "Helvetica-Bold" },
-  sectionTitle: { fontSize: 13, fontFamily: "Helvetica-Bold", marginBottom: 6 },
+  sectionTitle: {
+    fontSize: 13,
+    fontFamily: "Helvetica-Bold",
+    marginBottom: 6,
+    color: BRAND_COLOR,
+  },
   paragraph: { fontSize: 11, lineHeight: 1.5 },
 });
 
@@ -27,6 +48,10 @@ export function PropertySheetDocument({ property }: { property: Property }) {
   return (
     <Document>
       <Page size="A4" style={styles.page}>
+        <View style={styles.brandBar}>
+          <Text style={styles.brandText}>PKS PORTAL</Text>
+        </View>
+
         <Text style={styles.title}>{property.title}</Text>
         <Text style={styles.subtitle}>{property.neighborhood || "-"}</Text>
 

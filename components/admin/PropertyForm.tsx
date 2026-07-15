@@ -284,7 +284,7 @@ export default function PropertyForm({ property }: { property?: Property | null 
         <button
           type="submit"
           disabled={saving}
-          className="rounded-md bg-neutral-900 px-5 py-2 text-sm font-medium text-white hover:bg-neutral-700 disabled:opacity-50"
+          className="rounded-md bg-violet-700 px-5 py-2 text-sm font-medium text-white hover:bg-violet-800 disabled:opacity-50"
         >
           {saving ? "Salvando..." : property ? "Salvar alterações" : "Criar imóvel"}
         </button>
@@ -300,7 +300,7 @@ export default function PropertyForm({ property }: { property?: Property | null 
           outline: none;
         }
         .input:focus {
-          border-color: #737373;
+          border-color: #7c3aed;
         }
       `}</style>
     </form>

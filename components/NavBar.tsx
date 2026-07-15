@@ -6,18 +6,18 @@ export default function NavBar({ profile }: { profile: Profile | null }) {
   const isAdmin = profile?.role === "admin";
 
   return (
-    <header className="border-b border-neutral-200 bg-white">
+    <header className="border-b border-violet-100 bg-white">
       <div className="mx-auto flex max-w-5xl items-center justify-between px-4 py-3">
         <div className="flex items-center gap-6">
-          <Link href="/imoveis" className="font-semibold">
-            Hub de Imóveis
+          <Link href="/imoveis" className="font-semibold text-violet-800">
+            PKS Portal
           </Link>
           <nav className="flex items-center gap-4 text-sm text-neutral-600">
-            <Link href="/imoveis" className="hover:text-neutral-900">
+            <Link href="/imoveis" className="hover:text-violet-700">
               Imóveis
             </Link>
             {isAdmin && (
-              <Link href="/admin/imoveis" className="hover:text-neutral-900">
+              <Link href="/admin/imoveis" className="hover:text-violet-700">
                 Painel admin
               </Link>
             )}

@@ -28,7 +28,13 @@ export default function LoginForm() {
     setLoading(false);
 
     if (error) {
-      setError("Email ou senha inválidos.");
+      if (error.message === "Invalid login credentials") {
+        setError("Email ou senha inválidos.");
+      } else if (error.message === "Email not confirmed") {
+        setError("Esse email ainda não foi confirmado.");
+      } else {
+        setError(`Erro ao entrar: ${error.message}`);
+      }
       return;
     }
 
@@ -49,7 +55,7 @@ export default function LoginForm() {
           autoComplete="email"
           value={email}
           onChange={(e) => setEmail(e.target.value)}
-          className="rounded-md border border-neutral-300 px-3 py-2 text-sm outline-none focus:border-neutral-500"
+          className="rounded-md border border-neutral-300 px-3 py-2 text-sm outline-none focus:border-violet-500"
         />
       </div>
 
@@ -64,7 +70,7 @@ export default function LoginForm() {
           autoComplete="current-password"
           value={password}
           onChange={(e) => setPassword(e.target.value)}
-          className="rounded-md border border-neutral-300 px-3 py-2 text-sm outline-none focus:border-neutral-500"
+          className="rounded-md border border-neutral-300 px-3 py-2 text-sm outline-none focus:border-violet-500"
         />
       </div>
 
@@ -73,7 +79,7 @@ export default function LoginForm() {
       <button
         type="submit"
         disabled={loading}
-        className="mt-2 rounded-md bg-neutral-900 px-4 py-2 text-sm font-medium text-white hover:bg-neutral-700 disabled:opacity-50"
+        className="mt-2 rounded-md bg-violet-700 px-4 py-2 text-sm font-medium text-white hover:bg-violet-800 disabled:opacity-50"
       >
         {loading ? "Entrando..." : "Entrar"}
       </button>

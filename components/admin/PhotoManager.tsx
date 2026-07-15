@@ -204,7 +204,7 @@ export default function PhotoManager({
                 )}
 
                 {photo.id === coverPhotoId && (
-                  <span className="absolute left-1 top-1 rounded bg-neutral-900/80 px-1.5 py-0.5 text-[10px] font-medium text-white">
+                  <span className="absolute left-1 top-1 rounded bg-violet-700/90 px-1.5 py-0.5 text-[10px] font-medium text-white">
                     Capa
                   </span>
                 )}

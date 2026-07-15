@@ -13,7 +13,7 @@ const geistMono = Geist_Mono({
 });
 
 export const metadata: Metadata = {
-  title: "Hub de Imóveis",
+  title: "PKS Portal",
   description: "Catálogo de imóveis para corretores",
 };
 
