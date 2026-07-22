@@ -1,8 +1,13 @@
-import { Suspense } from "react";
 import LoginForm from "./LoginForm";
 import KeyIcon from "@/components/icons/KeyIcon";
 
-export default function LoginPage() {
+export default async function LoginPage({
+  searchParams,
+}: {
+  searchParams: Promise<{ next?: string }>;
+}) {
+  const { next } = await searchParams;
+
   return (
     <div className="relative flex flex-1 items-center justify-center overflow-hidden px-4 py-16">
       <div
@@ -28,9 +33,7 @@ export default function LoginPage() {
             imobiliária.
           </p>
         </div>
-        <Suspense>
-          <LoginForm />
-        </Suspense>
+        <LoginForm next={next || "/admin/imoveis"} />
       </div>
     </div>
   );
