@@ -7,23 +7,23 @@ export default function NavBar({ profile }: { profile: Profile | null }) {
   const initial = (profile?.name || profile?.email || "?").charAt(0).toUpperCase();
 
   return (
-    <header className="sticky top-0 z-10 border-b border-violet-100 bg-white/80 backdrop-blur-md">
+    <header className="sticky top-0 z-10 border-b border-violet-100 bg-white/80 backdrop-blur-md dark:border-neutral-800 dark:bg-neutral-950/80">
       <div className="mx-auto flex max-w-5xl items-center justify-between px-4 py-3">
         <div className="flex items-center gap-6">
           <Link href="/imoveis" className="text-violet-600 brand-font text-xl font-extrabold">
             Portal PKS
           </Link>
-          <nav className="flex items-center gap-1 text-sm font-medium text-neutral-600">
+          <nav className="flex items-center gap-1 text-sm font-medium text-neutral-600 dark:text-neutral-400">
             <Link
               href="/imoveis"
-              className="rounded-lg px-3 py-1.5 transition-colors hover:bg-violet-50 hover:text-violet-800"
+              className="rounded-lg px-3 py-1.5 transition-colors hover:bg-violet-50 hover:text-violet-800 dark:hover:bg-violet-950/40 dark:hover:text-violet-300"
             >
               Imóveis
             </Link>
             {isAdmin && (
               <Link
                 href="/admin/imoveis"
-                className="rounded-lg px-3 py-1.5 transition-colors hover:bg-violet-50 hover:text-violet-800"
+                className="rounded-lg px-3 py-1.5 transition-colors hover:bg-violet-50 hover:text-violet-800 dark:hover:bg-violet-950/40 dark:hover:text-violet-300"
               >
                 Painel admin
               </Link>
@@ -33,7 +33,7 @@ export default function NavBar({ profile }: { profile: Profile | null }) {
         {profile && (
           <div className="flex items-center gap-3">
             {profile.name && (
-              <span className="hidden text-sm text-neutral-500 sm:inline">
+              <span className="hidden text-sm text-neutral-500 sm:inline dark:text-neutral-400">
                 {profile.name}
               </span>
             )}

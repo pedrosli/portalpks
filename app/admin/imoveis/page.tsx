@@ -30,7 +30,7 @@ export default async function AdminPropertiesPage() {
     <div className="flex flex-col gap-6">
       <div className="flex items-center justify-between">
         <div>
-          <h1 className="text-2xl font-extrabold tracking-tight text-neutral-900">
+          <h1 className="text-2xl font-extrabold tracking-tight text-neutral-900 dark:text-neutral-100">
             Imóveis <span className="gradient-text">cadastrados</span>
           </h1>
           <p className="mt-1 text-sm text-neutral-500">
@@ -60,7 +60,7 @@ export default async function AdminPropertiesPage() {
               key={property.id}
               className="card card-interactive flex items-center gap-4 p-4"
             >
-              <div className="h-16 w-24 shrink-0 overflow-hidden rounded-lg bg-neutral-100">
+              <div className="h-16 w-24 shrink-0 overflow-hidden rounded-lg bg-neutral-100 dark:bg-neutral-800">
                 {coverUrl ? (
                   // eslint-disable-next-line @next/next/no-img-element
                   <img
@@ -78,7 +78,7 @@ export default async function AdminPropertiesPage() {
               <div className="min-w-0 flex-1">
                 <Link
                   href={`/admin/imoveis/${property.id}/editar`}
-                  className="font-semibold text-neutral-900 hover:text-violet-700"
+                  className="font-semibold text-neutral-900 dark:text-neutral-100 hover:text-violet-700"
                 >
                   {property.title}
                 </Link>

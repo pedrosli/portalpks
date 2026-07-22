@@ -43,7 +43,7 @@ export default function LoginForm({ next }: { next: string }) {
   return (
     <form onSubmit={handleSubmit} className="flex w-full max-w-sm flex-col gap-5">
       <div className="flex flex-col gap-1.5">
-        <label htmlFor="email" className="text-sm font-medium text-neutral-700">
+        <label htmlFor="email" className="text-sm font-medium text-neutral-700 dark:text-neutral-300">
           Email
         </label>
         <input
@@ -58,7 +58,7 @@ export default function LoginForm({ next }: { next: string }) {
       </div>
 
       <div className="flex flex-col gap-1.5">
-        <label htmlFor="password" className="text-sm font-medium text-neutral-700">
+        <label htmlFor="password" className="text-sm font-medium text-neutral-700 dark:text-neutral-300">
           Senha
         </label>
         <input

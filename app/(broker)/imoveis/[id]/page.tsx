@@ -63,7 +63,7 @@ export default async function PropertyDetailPage({
 
       <div className="flex flex-col gap-4 sm:flex-row sm:items-start sm:justify-between">
         <div>
-          <h1 className="text-2xl font-extrabold tracking-tight text-neutral-900">
+          <h1 className="text-2xl font-extrabold tracking-tight text-neutral-900 dark:text-neutral-100">
             {typedProperty.title}
           </h1>
           <p className="text-neutral-500">{typedProperty.neighborhood || "-"}</p>
@@ -84,7 +84,7 @@ export default async function PropertyDetailPage({
 
       <div className="card flex flex-col gap-3 p-5">
         <div className="flex items-center justify-between">
-          <h2 className="font-semibold text-neutral-900">Descrição sugerida</h2>
+          <h2 className="font-semibold text-neutral-900 dark:text-neutral-100">Descrição sugerida</h2>
           <CopyButton text={sheetText} />
         </div>
         <p className="text-xs text-neutral-500">
@@ -142,7 +142,7 @@ function InfoItem({ label, value }: { label: string; value: string }) {
   return (
     <div className="flex flex-col">
       <span className="text-xs text-neutral-500">{label}</span>
-      <span className="text-sm font-semibold text-neutral-900">{value}</span>
+      <span className="text-sm font-semibold text-neutral-900 dark:text-neutral-100">{value}</span>
     </div>
   );
 }

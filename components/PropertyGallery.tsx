@@ -15,7 +15,7 @@ export default function PropertyGallery({
 
   if (photos.length === 0) {
     return (
-      <div className="flex h-72 w-full items-center justify-center rounded-xl bg-neutral-100 text-sm text-neutral-400">
+      <div className="flex h-72 w-full items-center justify-center rounded-xl bg-neutral-100 dark:bg-neutral-800 text-sm text-neutral-400">
         Nenhuma foto cadastrada
       </div>
     );
@@ -25,7 +25,7 @@ export default function PropertyGallery({
 
   return (
     <div className="flex flex-col gap-3">
-      <div className="relative h-72 w-full overflow-hidden rounded-xl bg-neutral-100 shadow-inner sm:h-[28rem]">
+      <div className="relative h-72 w-full overflow-hidden rounded-xl bg-neutral-100 dark:bg-neutral-800 shadow-inner sm:h-[28rem]">
         {active.signedUrl && (
           <Image
             src={active.signedUrl}

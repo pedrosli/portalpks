@@ -234,7 +234,7 @@ export default function PropertyForm({ property }: { property?: Property | null 
         </Field>
 
         <div className="flex items-center gap-6 sm:col-span-2">
-          <label className="flex items-center gap-2 text-sm font-medium text-neutral-700">
+          <label className="flex items-center gap-2 text-sm font-medium text-neutral-700 dark:text-neutral-300">
             <input
               type="checkbox"
               checked={form.furnished}
@@ -243,7 +243,7 @@ export default function PropertyForm({ property }: { property?: Property | null 
             />
             Mobiliado
           </label>
-          <label className="flex items-center gap-2 text-sm font-medium text-neutral-700">
+          <label className="flex items-center gap-2 text-sm font-medium text-neutral-700 dark:text-neutral-300">
             <input
               type="checkbox"
               checked={form.pets_allowed}
@@ -309,7 +309,7 @@ function Field({
 }) {
   return (
     <label className={`flex flex-col gap-1 ${className ?? ""}`}>
-      <span className="text-sm font-medium text-neutral-700">
+      <span className="text-sm font-medium text-neutral-700 dark:text-neutral-300">
         {label}
         {required && <span className="text-red-500"> *</span>}
       </span>

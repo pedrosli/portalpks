@@ -39,7 +39,7 @@ export default async function PropertiesListPage({
   return (
     <div className="flex flex-col gap-8">
       <div>
-        <h1 className="text-2xl font-extrabold tracking-tight text-neutral-900 sm:text-3xl">
+        <h1 className="text-2xl font-extrabold tracking-tight text-neutral-900 dark:text-neutral-100 sm:text-3xl">
           Encontre o <span className="gradient-text">imóvel certo</span>
         </h1>
         <p className="mt-1 text-sm text-neutral-500">
@@ -84,7 +84,7 @@ export default async function PropertiesListPage({
               href={`/imoveis/${property.id}`}
               className="card card-interactive group flex flex-col overflow-hidden"
             >
-              <div className="relative h-44 w-full overflow-hidden bg-neutral-100">
+              <div className="relative h-44 w-full overflow-hidden bg-neutral-100 dark:bg-neutral-800">
                 {coverUrl ? (
                   // eslint-disable-next-line @next/next/no-img-element
                   <img
@@ -103,7 +103,7 @@ export default async function PropertiesListPage({
                 </span>
               </div>
               <div className="flex flex-col gap-1 p-4">
-                <h2 className="font-semibold text-neutral-900">{property.title}</h2>
+                <h2 className="font-semibold text-neutral-900 dark:text-neutral-100">{property.title}</h2>
                 <p className="text-sm text-neutral-500">
                   {property.neighborhood || "-"}
                 </p>
