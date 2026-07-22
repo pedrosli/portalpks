@@ -18,7 +18,7 @@ export default function Home() {
       />
 
       <div className="card relative flex w-full max-w-md flex-col items-center gap-6 px-8 py-12 text-center">
-        <h1 className="gradient-text brand-font text-4xl font-extrabold">
+        <h1 className="text-violet-600 brand-font text-4xl font-extrabold">
           Portal PKS
         </h1>
         <p className="text-sm text-neutral-500">
