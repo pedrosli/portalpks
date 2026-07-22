@@ -1,6 +1,7 @@
 "use client";
 
 import { useState } from "react";
+import Image from "next/image";
 import type { PropertyPhoto } from "@/lib/types";
 
 export default function PropertyGallery({
@@ -24,13 +25,15 @@ export default function PropertyGallery({
 
   return (
     <div className="flex flex-col gap-3">
-      <div className="h-72 w-full overflow-hidden rounded-xl bg-neutral-100 shadow-inner sm:h-[28rem]">
+      <div className="relative h-72 w-full overflow-hidden rounded-xl bg-neutral-100 shadow-inner sm:h-[28rem]">
         {active.signedUrl && (
-          // eslint-disable-next-line @next/next/no-img-element
-          <img
+          <Image
             src={active.signedUrl}
             alt={title}
-            className="h-full w-full object-cover transition-opacity duration-300"
+            fill
+            priority={activeIndex === 0}
+            sizes="(max-width: 640px) 100vw, 800px"
+            className="object-cover transition-opacity duration-300"
           />
         )}
       </div>
@@ -40,18 +43,19 @@ export default function PropertyGallery({
             <button
               key={photo.id}
               onClick={() => setActiveIndex(index)}
-              className={`h-16 w-24 shrink-0 overflow-hidden rounded-lg border-2 transition-all duration-200 ${
+              className={`relative h-16 w-24 shrink-0 overflow-hidden rounded-lg border-2 transition-all duration-200 ${
                 index === activeIndex
                   ? "border-violet-600 shadow-md shadow-violet-600/20"
                   : "border-transparent opacity-70 hover:opacity-100"
               }`}
             >
               {photo.signedUrl && (
-                // eslint-disable-next-line @next/next/no-img-element
-                <img
+                <Image
                   src={photo.signedUrl}
                   alt=""
-                  className="h-full w-full object-cover"
+                  fill
+                  sizes="96px"
+                  className="object-cover"
                 />
               )}
             </button>
