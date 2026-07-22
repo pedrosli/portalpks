@@ -71,7 +71,7 @@ export default async function PropertiesListPage({
         </p>
       )}
 
-      <div className="grid grid-cols-1 gap-5 sm:grid-cols-2 lg:grid-cols-3">
+      <div className="grid grid-cols-1 gap-5 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4">
         {list.map((property) => {
           const coverPhoto = property.property_photos.find(
             (ph) => ph.id === property.cover_photo_id

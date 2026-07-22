@@ -94,7 +94,7 @@ export default async function PropertyDetailPage({
         <SuggestedDescription text={sheetText} />
       </div>
 
-      <div className="card grid grid-cols-2 gap-5 p-5 sm:grid-cols-4">
+      <div className="card grid grid-cols-2 gap-5 p-5 sm:grid-cols-3 lg:grid-cols-4">
         <InfoItem label="Aluguel" value={formatCurrency(typedProperty.price)} />
         <InfoItem
           label="Área"
