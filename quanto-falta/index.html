@@ -1,0 +1,1928 @@
+<!doctype html>
+<html lang="pt-BR">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<meta name="theme-color" content="#F4F7FC" media="(prefers-color-scheme: light)">
+<meta name="theme-color" content="#1B2926" media="(prefers-color-scheme: dark)">
+<meta property="og:type" content="website">
+<meta property="og:title" content="Quanto Falta pra Passar?">
+<meta property="og:description" content="Calculadora de notas pra galera do Mackenzie: média de cada etapa (At1, At2 e APA), média final e quanto falta pra passar em cada matéria.">
+<link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'%3E%3Ctext y='.9em' font-size='88'%3E%E2%9C%8F%EF%B8%8F%3C/text%3E%3C/svg%3E">
+<style>
+  :root { padding-top: env(safe-area-inset-top, 0px); padding-bottom: env(safe-area-inset-bottom, 0px); }
+  body { margin: 0; }
+  img { max-width: 100%; }
+  [hidden] { display: none !important; }
+</style>
+<title>Quanto Falta pra Passar?</title>
+<meta name="description" content="Calculadora de notas pra galera do Mackenzie: média de cada etapa (At1, At2 e APA), média final e quanto falta pra passar em cada matéria.">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Baloo+2:wght@500;600;700;800&family=Caveat:wght@600;700&family=Nunito:wght@400;600;700;800&display=swap">
+<style>
+/* Layout: folha de caderno quadriculado. Cabeçalho com as regras (etapas 2-2-3; At1, At2, APA 4-4-2),
+   resumo do ano, fichas de matéria em grade; cada ficha abre uma folha com as 3 etapas, o simulador e a conta explicada */
+:root {
+  --paper: #F4F7FC;
+  --grid: rgba(66, 112, 200, .12);
+  --margin: rgba(229, 72, 92, .45);
+  --card: #FFFFFF;
+  --card-2: #EEF3FA;
+  --edge: #1C2847;
+  --hard: #1C2847;
+  --ink: #1C2847;
+  --ink-soft: #55617E;
+  --ink-faint: #8590AB;
+  --line: #D5DDEB;
+  --pen: #2D58E6;
+  --pen-soft: rgba(45, 88, 230, .14);
+  --pen-ink: #FFFFFF;
+  --hl: #FFE14D;
+  --hl-ink: #3B3100;
+  --board: #23443B;
+  --board-ink: #F1F5EA;
+  --board-soft: rgba(241, 245, 234, .72);
+  --backdrop: rgba(28, 40, 71, .45);
+
+  --ok: #0F7A41;   --ok-bg: #D9F2E2;
+  --go: #2563B8;   --go-bg: #DDE8F8;
+  --warn: #8E5B00; --warn-bg: #FFEFC0;
+  --hot: #BB470A;  --hot-bg: #FFE1CC;
+  --bad: #C0283F;  --bad-bg: #FCDCE1;
+  --none: #5F6984; --none-bg: #E8ECF4;
+
+  --s0: #FF8B7B; --s1: #FFC93C; --s2: #62CF8E; --s3: #4FC3F0;
+  --s4: #B08CFF; --s5: #FF9BCF; --s6: #FFA057; --s7: #3FCFC0;
+
+  --f-display: "Baloo 2", ui-rounded, "Nunito", system-ui, sans-serif;
+  --f-body: "Nunito", ui-rounded, system-ui, -apple-system, "Segoe UI", Roboto, sans-serif;
+  --f-hand: "Caveat", "Segoe Print", "Comic Sans MS", cursive;
+}
+@media (prefers-color-scheme: dark) {
+  :root:not([data-theme="light"]) {
+    --paper: #1B2926; --grid: rgba(214, 236, 226, .07); --margin: rgba(255, 128, 140, .32);
+    --card: #22332F; --card-2: #2B3E3A; --edge: #4A645D; --hard: #0C1412;
+    --ink: #EEF4EF; --ink-soft: #B2C2BC; --ink-faint: #82958F; --line: #3A514B;
+    --pen: #93B4FF; --pen-soft: rgba(147, 180, 255, .18); --pen-ink: #0F1A33;
+    --hl: #EBD35C; --hl-ink: #2A2300;
+    --board: #F1EEDF; --board-ink: #23332F; --board-soft: rgba(35, 51, 47, .7);
+    --backdrop: rgba(5, 10, 9, .62);
+    --ok: #66DA97; --ok-bg: rgba(102, 218, 151, .15);
+    --go: #8ABEFF; --go-bg: rgba(138, 190, 255, .15);
+    --warn: #F2C453; --warn-bg: rgba(242, 196, 83, .15);
+    --hot: #FFA06A; --hot-bg: rgba(255, 160, 106, .16);
+    --bad: #FF8496; --bad-bg: rgba(255, 132, 150, .16);
+    --none: #A7B7B1; --none-bg: rgba(167, 183, 177, .13);
+    --s0: #E9786A; --s1: #E3B23A; --s2: #52B97F; --s3: #45ADD8;
+    --s4: #9C7FE3; --s5: #E489BA; --s6: #E8904F; --s7: #38B5A8;
+    color-scheme: dark;
+  }
+}
+:root[data-theme="dark"] {
+  --paper: #1B2926; --grid: rgba(214, 236, 226, .07); --margin: rgba(255, 128, 140, .32);
+  --card: #22332F; --card-2: #2B3E3A; --edge: #4A645D; --hard: #0C1412;
+  --ink: #EEF4EF; --ink-soft: #B2C2BC; --ink-faint: #82958F; --line: #3A514B;
+  --pen: #93B4FF; --pen-soft: rgba(147, 180, 255, .18); --pen-ink: #0F1A33;
+  --hl: #EBD35C; --hl-ink: #2A2300;
+  --board: #F1EEDF; --board-ink: #23332F; --board-soft: rgba(35, 51, 47, .7);
+  --backdrop: rgba(5, 10, 9, .62);
+  --ok: #66DA97; --ok-bg: rgba(102, 218, 151, .15);
+  --go: #8ABEFF; --go-bg: rgba(138, 190, 255, .15);
+  --warn: #F2C453; --warn-bg: rgba(242, 196, 83, .15);
+  --hot: #FFA06A; --hot-bg: rgba(255, 160, 106, .16);
+  --bad: #FF8496; --bad-bg: rgba(255, 132, 150, .16);
+  --none: #A7B7B1; --none-bg: rgba(167, 183, 177, .13);
+  --s0: #E9786A; --s1: #E3B23A; --s2: #52B97F; --s3: #45ADD8;
+  --s4: #9C7FE3; --s5: #E489BA; --s6: #E8904F; --s7: #38B5A8;
+  color-scheme: dark;
+}
+
+* { box-sizing: border-box; }
+html:has(dialog[open]) { overflow: hidden; }
+body {
+  background-color: var(--paper);
+  background-image:
+    linear-gradient(var(--grid) 1px, transparent 1px),
+    linear-gradient(90deg, var(--grid) 1px, transparent 1px);
+  background-size: 22px 22px;
+  color: var(--ink);
+  font-family: var(--f-body);
+  font-size: 16px;
+  line-height: 1.5;
+  -webkit-font-smoothing: antialiased;
+}
+button, input, select, textarea { font: inherit; color: inherit; }
+button { cursor: pointer; }
+:focus-visible { outline: 3px solid var(--pen); outline-offset: 2px; }
+h1, h2, h3 { text-wrap: balance; margin: 0; }
+p { margin: 0; }
+.sr { position: absolute; width: 1px; height: 1px; padding: 0; margin: -1px; overflow: hidden; clip: rect(0 0 0 0); white-space: nowrap; border: 0; }
+
+.page {
+  max-width: 1140px;
+  margin: 0 auto;
+  padding-block: 28px 56px;
+  padding-left: max(16px, env(safe-area-inset-left, 0px));
+  padding-right: max(16px, env(safe-area-inset-right, 0px));
+  display: grid;
+  gap: 28px;
+}
+@media (min-width: 1000px) {
+  .page {
+    border-left: 2px solid var(--margin);
+    box-shadow: -6px 0 0 -4px var(--margin);
+    padding-left: max(44px, env(safe-area-inset-left, 0px));
+    padding-right: max(24px, env(safe-area-inset-right, 0px));
+  }
+}
+
+/* ---------- Cabeçalho ---------- */
+.top { display: flex; flex-wrap: wrap; align-items: flex-end; justify-content: space-between; gap: 18px 28px; }
+.brand { display: grid; gap: 10px; min-width: 0; max-width: 40rem; }
+.logo {
+  font: 800 clamp(2.5rem, 7vw, 4rem)/0.95 var(--f-display);
+  letter-spacing: -0.01em;
+  color: var(--ink);
+}
+.logo mark {
+  color: var(--hl-ink);
+  background: linear-gradient(100deg, transparent 1%, var(--hl) 3%, var(--hl) 97%, transparent 99%);
+  padding: 0 .12em;
+  border-radius: .18em .3em .22em .28em;
+  box-decoration-break: clone;
+}
+.scribble {
+  font: 700 1.45rem/1 var(--f-hand);
+  color: var(--pen);
+  transform: rotate(-2.5deg);
+  transform-origin: left center;
+  justify-self: start;
+  margin: 6px 0 0 .2rem;
+}
+.tagline { color: var(--ink-soft); font-size: 1.08rem; max-width: 36rem; }
+
+.rules {
+  display: grid;
+  grid-template-columns: 1fr auto;
+  align-items: center;
+  gap: 2px 14px;
+  text-align: left;
+  padding: 12px 16px;
+  background: var(--card);
+  border: 2px dashed var(--ink-faint);
+  border-radius: 14px;
+  max-width: 100%;
+  min-width: 0;
+}
+.rules:hover { border-color: var(--pen); }
+.rules__k { grid-column: 1; font-size: .74rem; font-weight: 800; letter-spacing: .09em; text-transform: uppercase; color: var(--ink-faint); }
+.rules__v { grid-column: 1; font-weight: 700; color: var(--ink); min-width: 0; max-width: 24rem; }
+.rules__edit { grid-column: 2; grid-row: 1 / span 2; font: 700 1.3rem/1 var(--f-hand); color: var(--pen); white-space: nowrap; }
+
+/* ---------- Post-it de exemplo ---------- */
+.postit {
+  justify-self: start;
+  max-width: 34rem;
+  display: grid;
+  gap: 8px;
+  padding: 16px 20px 18px;
+  background: var(--hl);
+  color: var(--hl-ink);
+  border-radius: 4px 4px 18px 4px;
+  transform: rotate(-.8deg);
+  box-shadow: 0 10px 18px -12px rgba(0, 0, 0, .45);
+}
+.postit__hey { font: 700 1.7rem/1 var(--f-hand); }
+.postit .btn { justify-self: start; background: var(--card); color: var(--ink); }
+
+/* ---------- Botões ---------- */
+.btn {
+  display: inline-flex; align-items: center; justify-content: center; gap: 8px;
+  padding: 10px 18px;
+  border-radius: 999px;
+  border: 2px solid var(--edge);
+  background: var(--card);
+  color: var(--ink);
+  font-weight: 800;
+  box-shadow: 3px 3px 0 var(--hard);
+  transition: transform .12s ease, box-shadow .12s ease;
+}
+.btn:hover { transform: translate(-1px, -1px); box-shadow: 4px 4px 0 var(--hard); }
+.btn:active { transform: translate(2px, 2px); box-shadow: 1px 1px 0 var(--hard); }
+.btn--primary { background: var(--pen); color: var(--pen-ink); }
+.btn--small { padding: 7px 14px; font-size: .95rem; }
+.btn--ghost { box-shadow: none; border-color: var(--line); background: transparent; }
+.btn--ghost:hover { box-shadow: none; border-color: var(--ink-faint); transform: none; }
+.btn--danger { background: var(--bad); color: var(--card); border-color: var(--bad); box-shadow: none; }
+.linkish {
+  justify-self: start;
+  background: none; border: 0; padding: 4px 0;
+  color: var(--pen); font-weight: 700; text-align: left;
+  text-decoration: underline; text-decoration-thickness: 2px; text-underline-offset: 3px;
+  text-decoration-color: var(--pen-soft);
+}
+.linkish:hover { text-decoration-color: var(--pen); }
+
+/* ---------- Resumo ---------- */
+.summary { display: flex; flex-wrap: wrap; align-items: center; gap: 10px 22px; }
+.sum__lead { font: 800 1.35rem/1.1 var(--f-display); }
+.sum__chips { display: flex; flex-wrap: wrap; gap: 8px; list-style: none; margin: 0; padding: 0; }
+.sum__chips li {
+  display: inline-flex; align-items: center; gap: 6px;
+  padding: 5px 12px 5px 8px;
+  border-radius: 999px;
+  background: var(--st-bg); color: var(--st);
+  font-weight: 700; font-size: .95rem;
+}
+.sum__chips li b { font: 800 1.05rem/1 var(--f-display); min-width: 1.4em; height: 1.4em; display: inline-grid; place-items: center; border-radius: 999px; background: var(--card); padding: 0 .3em; }
+.sum__avg { margin-left: auto; color: var(--ink-soft); font-weight: 700; }
+.sum__avg b { font: 800 1.5rem/1 var(--f-display); color: var(--ink); margin-left: 6px; font-variant-numeric: tabular-nums; }
+@media (max-width: 640px) { .sum__avg { margin-left: 0; } }
+
+/* tons de status */
+.t-ok   { --st: var(--ok);   --st-bg: var(--ok-bg); }
+.t-go   { --st: var(--go);   --st-bg: var(--go-bg); }
+.t-warn { --st: var(--warn); --st-bg: var(--warn-bg); }
+.t-hot  { --st: var(--hot);  --st-bg: var(--hot-bg); }
+.t-bad  { --st: var(--bad);  --st-bg: var(--bad-bg); }
+.t-none { --st: var(--none); --st-bg: var(--none-bg); }
+
+/* ---------- Fichas ---------- */
+.grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(min(100%, 290px), 1fr));
+  gap: 30px 22px;
+  padding-top: 8px;
+}
+.card {
+  position: relative;
+  display: flex; flex-direction: column; gap: 12px;
+  min-width: 0;
+  text-align: left;
+  padding: 20px 18px 16px;
+  background: var(--card);
+  color: var(--ink);
+  border: 2px solid var(--edge);
+  border-radius: 18px;
+  box-shadow: 4px 4px 0 var(--hard);
+  transition: transform .15s ease, box-shadow .15s ease;
+}
+.card:hover { transform: translate(-2px, -2px); box-shadow: 6px 6px 0 var(--hard); }
+.card:active { transform: translate(2px, 2px); box-shadow: 2px 2px 0 var(--hard); }
+.card__tape {
+  position: absolute; top: -12px; left: 50%;
+  width: 78px; height: 22px;
+  transform: translateX(-50%) rotate(-3deg);
+  background: color-mix(in srgb, var(--c) 78%, transparent);
+  border-radius: 2px;
+}
+.card:nth-child(even) .card__tape { transform: translateX(-50%) rotate(2.5deg); }
+.card__top { display: flex; align-items: center; gap: 12px; min-width: 0; }
+.card__emoji {
+  flex: none;
+  width: 46px; height: 46px; display: grid; place-items: center;
+  border-radius: 50%;
+  background: color-mix(in srgb, var(--c) 32%, var(--card));
+  font-size: 1.45rem;
+}
+.card__name { font: 700 1.32rem/1.1 var(--f-display); min-width: 0; overflow-wrap: anywhere; }
+.pill {
+  align-self: flex-start;
+  display: inline-flex; align-items: center; gap: 6px;
+  padding: 3px 12px;
+  border-radius: 999px;
+  background: var(--st-bg); color: var(--st);
+  font-weight: 800; font-size: .92rem;
+}
+.big { display: grid; gap: 0; }
+.big__pre { font-size: .9rem; font-weight: 700; color: var(--ink-soft); }
+.big__row { display: flex; flex-wrap: wrap; align-items: baseline; gap: 2px 8px; }
+.big__row strong { font: 800 2.5rem/1 var(--f-display); color: var(--st); font-variant-numeric: tabular-nums; }
+.big__row strong.is-word { font-size: 1.9rem; }
+.big__post { font-size: .92rem; font-weight: 700; color: var(--ink-soft); }
+.card__chips { display: flex; flex-wrap: wrap; gap: 6px; }
+.chip {
+  display: inline-flex; align-items: baseline; gap: 5px;
+  padding: 2px 9px;
+  border-radius: 8px;
+  background: var(--card-2);
+  font-weight: 800; font-size: .92rem;
+  font-variant-numeric: tabular-nums;
+}
+.chip i { font-style: normal; font-size: .76rem; color: var(--ink-faint); }
+.chip--empty { color: var(--ink-faint); }
+.chip--partial { background: transparent; box-shadow: inset 0 0 0 1.5px var(--line); }
+.card__warn { font-size: .85rem; font-weight: 700; color: var(--bad); }
+.card--add {
+  align-items: center; justify-content: center; gap: 6px;
+  min-height: 200px;
+  background: color-mix(in srgb, var(--card) 55%, transparent);
+  border: 2px dashed var(--ink-faint);
+  box-shadow: none;
+  color: var(--ink-soft);
+  font-weight: 800;
+}
+.card--add:hover { border-color: var(--pen); color: var(--pen); box-shadow: none; transform: none; }
+.card--add .plus { font: 800 2.6rem/1 var(--f-display); }
+
+/* termômetro */
+.thermo { position: relative; display: block; padding-top: 20px; }
+.thermo__track {
+  position: relative; display: block;
+  height: 12px;
+  border-radius: 999px;
+  background: var(--card-2);
+  box-shadow: inset 0 0 0 1.5px var(--line);
+  overflow: hidden;
+}
+.thermo__got { position: absolute; top: 0; bottom: 0; left: 0; background: var(--st); border-radius: 999px 0 0 999px; }
+.thermo__left {
+  position: absolute; top: 0; bottom: 0;
+  background: repeating-linear-gradient(-45deg, color-mix(in srgb, var(--st) 42%, transparent) 0 4px, transparent 4px 8px);
+}
+.thermo__pass {
+  position: absolute; top: 0; bottom: -4px; width: 0;
+  display: flex; flex-direction: column; align-items: center;
+}
+.thermo__pass span { font: 700 1.05rem/1 var(--f-hand); color: var(--ink); white-space: nowrap; }
+.thermo__pass::after { content: ""; flex: 1; width: 3px; margin-top: 2px; border-radius: 2px; background: var(--ink); }
+.thermo--big { padding-top: 24px; }
+.thermo--big .thermo__track { height: 20px; }
+.thermo--big .thermo__pass span { font-size: 1.25rem; }
+
+/* ---------- Como funciona ---------- */
+.how { display: grid; grid-template-columns: minmax(0, 1.2fr) minmax(0, 1fr); gap: 24px; align-items: start; }
+@media (max-width: 820px) { .how { grid-template-columns: minmax(0, 1fr); } }
+.how h2 { font: 800 1.7rem/1.1 var(--f-display); margin-bottom: 14px; }
+.steps { list-style: none; margin: 0; padding: 0; display: grid; gap: 14px; counter-reset: s; }
+.steps li { position: relative; padding-left: 48px; max-width: 38rem; color: var(--ink-soft); }
+.steps li b { color: var(--ink); }
+.steps li::before {
+  counter-increment: s; content: counter(s);
+  position: absolute; left: 0; top: -2px;
+  width: 34px; height: 34px; display: grid; place-items: center;
+  border-radius: 50%;
+  border: 2px solid var(--edge);
+  background: var(--hl); color: var(--hl-ink);
+  font: 800 1.1rem/1 var(--f-display);
+}
+.board {
+  display: grid; gap: 12px;
+  padding: 20px 22px 22px;
+  border-radius: 16px;
+  background: var(--board);
+  color: var(--board-ink);
+  border: 6px solid color-mix(in srgb, var(--board) 70%, #8A5A2B);
+  transform: rotate(.6deg);
+}
+.board__t { font: 700 1.3rem/1 var(--f-hand); color: var(--board-soft); }
+.board__f { font: 700 1.6rem/1.15 var(--f-hand); overflow-wrap: anywhere; }
+.board__ex { font-size: .98rem; color: var(--board-soft); }
+.board__ex b { color: var(--board-ink); }
+
+.tools { display: flex; flex-wrap: wrap; align-items: center; gap: 12px; }
+.confirm {
+  display: flex; flex-wrap: wrap; align-items: center; gap: 10px;
+  padding: 12px 14px;
+  border-radius: 14px;
+  background: var(--bad-bg);
+  color: var(--ink);
+  font-weight: 700;
+}
+.copybox { display: grid; gap: 8px; width: 100%; }
+.copybox textarea { width: 100%; min-height: 9rem; padding: 12px; border-radius: 12px; border: 2px solid var(--line); background: var(--card); font-size: .95rem; }
+.fine { display: grid; gap: 4px; width: 100%; font-size: .92rem; color: var(--ink-faint); }
+
+/* ---------- Folhas (dialogs) ---------- */
+dialog.sheet {
+  padding: 0;
+  width: min(720px, calc(100% - 32px));
+  max-width: 100%;
+  max-height: min(92dvh, 940px);
+  border: 2px solid var(--edge);
+  border-radius: 22px;
+  background: var(--card);
+  color: var(--ink);
+  box-shadow: 8px 8px 0 var(--hard);
+  overflow: auto;
+  overscroll-behavior: contain;
+}
+dialog.sheet--sm { width: min(560px, calc(100% - 32px)); }
+dialog.sheet::backdrop { background: var(--backdrop); }
+@media (max-width: 640px) {
+  dialog.sheet, dialog.sheet--sm {
+    width: 100%;
+    max-height: 94dvh;
+    margin: auto 0 0;
+    border-width: 2px 0 0;
+    border-radius: 22px 22px 0 0;
+    box-shadow: none;
+  }
+}
+.sheet__head {
+  position: sticky; top: 0; z-index: 3;
+  display: flex; align-items: center; gap: 12px;
+  padding-block: 14px;
+  padding-inline: clamp(16px, 4vw, 28px);
+  background: var(--card);
+  border-bottom: 2px dashed var(--line);
+}
+.sheet__head h2 { font: 800 1.55rem/1.1 var(--f-display); flex: 1; min-width: 0; }
+.sheet__main {
+  display: grid; gap: 22px;
+  padding-block: 20px 8px;
+  padding-inline: clamp(16px, 4vw, 28px);
+}
+.sheet__foot {
+  display: flex; flex-wrap: wrap; align-items: center; justify-content: flex-end; gap: 10px;
+  padding-block: 16px calc(18px + env(safe-area-inset-bottom, 0px));
+  padding-inline: clamp(16px, 4vw, 28px);
+}
+.sheet__foot--split { justify-content: space-between; }
+.x {
+  flex: none;
+  width: 42px; height: 42px;
+  display: grid; place-items: center;
+  border-radius: 50%;
+  border: 2px solid var(--line);
+  background: var(--card);
+  font-size: 1.5rem; line-height: 1;
+  color: var(--ink-soft);
+}
+.x:hover { border-color: var(--ink-faint); color: var(--ink); }
+.emoji-btn {
+  flex: none;
+  width: 50px; height: 50px; display: grid; place-items: center;
+  border-radius: 50%;
+  border: 2px dashed transparent;
+  background: color-mix(in srgb, var(--c) 32%, var(--card));
+  font-size: 1.55rem;
+}
+.emoji-btn:hover { border-color: var(--ink-faint); }
+.name-input {
+  flex: 1; min-width: 0;
+  font: 800 1.6rem/1.1 var(--f-display);
+  padding: 4px 6px;
+  border: 0; border-bottom: 2px solid transparent; border-radius: 6px 6px 0 0;
+  background: transparent;
+}
+.name-input:hover { border-bottom-color: var(--line); }
+.name-input:focus { outline: none; border-bottom-color: var(--pen); background: var(--pen-soft); }
+.emoji-pick { display: flex; flex-wrap: wrap; gap: 6px; padding: 12px; border-radius: 14px; background: var(--card-2); }
+.emoji-pick button { width: 44px; height: 44px; border-radius: 12px; border: 2px solid transparent; background: var(--card); font-size: 1.35rem; }
+.emoji-pick button:hover, .emoji-pick button[aria-pressed="true"] { border-color: var(--pen); }
+.colors { display: flex; gap: 8px; flex-wrap: wrap; width: 100%; padding-top: 4px; }
+.colors button { width: 30px; height: 30px; border-radius: 50%; border: 3px solid var(--card); background: var(--c); box-shadow: 0 0 0 2px var(--line); }
+.colors button[aria-pressed="true"] { box-shadow: 0 0 0 3px var(--ink); }
+
+.verdict {
+  position: relative;
+  display: flex; gap: 14px; align-items: flex-start;
+  padding: 16px 18px;
+  border-radius: 16px;
+  background: var(--st-bg);
+}
+.verdict__face { font-size: 2.4rem; line-height: 1; flex: none; }
+.verdict__body { display: grid; gap: 4px; min-width: 0; }
+.verdict__title { font: 800 1.65rem/1.1 var(--f-display); color: var(--st); }
+.verdict__text { color: var(--ink); max-width: 36rem; }
+.verdict__text b { color: var(--st); font-weight: 800; font-size: 1.12em; }
+.stamp {
+  position: absolute; top: -14px; right: 14px;
+  padding: 6px 12px 3px;
+  border: 3px double var(--ok);
+  border-radius: 8px;
+  background: var(--card);
+  color: var(--ok);
+  font: 800 1rem/1 var(--f-display);
+  letter-spacing: .14em;
+  text-transform: uppercase;
+  transform: rotate(7deg);
+}
+.stamp--in { animation: stamp .5s cubic-bezier(.2, 1.5, .4, 1) both; }
+@keyframes stamp { from { transform: rotate(7deg) scale(2.3); opacity: 0; } to { transform: rotate(7deg) scale(1); opacity: 1; } }
+.legend { display: flex; flex-wrap: wrap; gap: 6px 18px; font-size: .92rem; color: var(--ink-soft); }
+.legend b { color: var(--ink); font-variant-numeric: tabular-nums; }
+.sw { display: inline-block; width: 12px; height: 12px; border-radius: 3px; margin-right: 6px; vertical-align: -1px; }
+.sw--got { background: var(--st); }
+.sw--left { background: repeating-linear-gradient(-45deg, color-mix(in srgb, var(--st) 55%, transparent) 0 3px, transparent 3px 6px); box-shadow: inset 0 0 0 1px var(--line); }
+.sw--pass { width: 3px; background: var(--ink); border-radius: 2px; }
+
+.block { display: grid; gap: 10px; }
+.block__t { font: 800 1.2rem/1.2 var(--f-display); }
+.block__t small { font: 600 .9rem var(--f-body); color: var(--ink-faint); margin-left: 6px; }
+
+.etapa { display: grid; gap: 10px; padding-block: 16px; border-top: 2px dashed var(--line); }
+.etapa:first-child { border-top: 0; padding-top: 4px; }
+.etapa__row { display: flex; flex-wrap: wrap; align-items: center; gap: 10px 14px; }
+.etapa__name { flex: 1 1 9rem; min-width: 0; font: 800 1.25rem/1.15 var(--f-display); }
+.etapa__name small { display: block; font: 600 .85rem/1.3 var(--f-body); color: var(--ink-faint); }
+.etapa__field { display: flex; align-items: center; gap: 6px; }
+.etapa__lbl { font-size: .78rem; font-weight: 800; letter-spacing: .07em; text-transform: uppercase; color: var(--ink-faint); }
+.etapa__out { flex: 0 1 auto; min-width: 0; }
+.grade {
+  width: 5.4rem;
+  padding: 8px 6px 5px;
+  border: 2px solid var(--line);
+  border-radius: 12px;
+  background: var(--paper);
+  color: var(--ink);
+  font: 700 1.55rem/1 var(--f-display);
+  text-align: center;
+  font-variant-numeric: tabular-nums;
+}
+.grade::placeholder { color: var(--ink-faint); }
+.grade:focus { outline: none; border-color: var(--pen); box-shadow: 0 0 0 4px var(--pen-soft); }
+.grade[aria-invalid="true"] { border-color: var(--bad); background: var(--bad-bg); }
+.grade--calc { display: inline-grid; place-items: center; min-height: 2.9rem; background: var(--card-2); border-style: dashed; }
+.grade--calc small { display: block; font: 700 .66rem/1 var(--f-body); color: var(--ink-faint); letter-spacing: .04em; text-transform: uppercase; }
+.grade__max { color: var(--ink-faint); font-weight: 800; }
+.tag {
+  display: inline-flex; align-items: baseline; flex-wrap: wrap; gap: 4px;
+  padding: 4px 12px;
+  border-radius: 999px;
+  background: var(--st-bg); color: var(--st);
+  font-weight: 700; font-size: .95rem;
+}
+.tag b { font: 800 1.15rem/1 var(--f-display); }
+.err-inline { color: var(--bad); font-weight: 700; font-size: .88rem; line-height: 1.25; }
+.hint { font-size: .88rem; color: var(--ink-faint); }
+
+.acts3 {
+  display: grid; grid-template-columns: repeat(var(--cols, 3), minmax(0, 1fr)); gap: 10px;
+  padding: 12px;
+  border-radius: 14px;
+  background: var(--card-2);
+}
+.act3 { display: grid; gap: 6px; justify-items: center; align-content: start; text-align: center; min-width: 0; }
+.act3__n { font: 800 1.1rem/1.05 var(--f-display); }
+.act3__n small { display: block; font: 700 .74rem/1.3 var(--f-body); color: var(--ink-faint); letter-spacing: .02em; }
+.act3 .grade { width: 100%; max-width: 6.2rem; background: var(--card); }
+.act3__out:empty { display: none; }
+.need {
+  display: grid; justify-items: center;
+  padding: 4px 10px 5px;
+  border-radius: 12px;
+  background: var(--st-bg); color: var(--st);
+  font-weight: 700; font-size: .78rem; line-height: 1.2;
+}
+.need b { font: 800 1.2rem/1 var(--f-display); }
+.scheme { display: flex; flex-wrap: wrap; align-items: center; gap: 8px; }
+.scheme__lbl { font-size: .78rem; font-weight: 800; letter-spacing: .07em; text-transform: uppercase; color: var(--ink-faint); margin-right: 2px; }
+.scheme__o { position: relative; }
+.scheme__o input { position: absolute; inset: 0; opacity: 0; margin: 0; cursor: pointer; }
+.scheme__o span { display: inline-block; padding: 6px 12px; border-radius: 999px; border: 2px solid var(--line); font-weight: 700; font-size: .92rem; color: var(--ink-soft); }
+.scheme__o input:checked + span { border-color: var(--pen); background: var(--pen-soft); color: var(--ink); }
+.scheme__o input:focus-visible + span { outline: 3px solid var(--pen); outline-offset: 2px; }
+
+.sim { padding: 16px 18px; border-radius: 16px; border: 2px solid var(--line); }
+.sim__q { font-size: 1.08rem; font-weight: 700; }
+.sim__q b { font: 800 1.7rem/1 var(--f-display); color: var(--pen); font-variant-numeric: tabular-nums; }
+.sim input[type="range"] { width: 100%; accent-color: var(--pen); height: 34px; margin: 0; }
+.sim__scale { display: flex; justify-content: space-between; font-size: .8rem; font-weight: 700; color: var(--ink-faint); margin-top: -6px; }
+.sim__a { font-size: 1.05rem; }
+.sim__a b { font: 800 1.35rem/1 var(--f-display); color: var(--st); }
+
+.how-calc summary { cursor: pointer; font-weight: 800; color: var(--pen); width: fit-content; }
+.how-calc ol { margin: 10px 0 0; padding-left: 1.3rem; display: grid; gap: 6px; color: var(--ink-soft); }
+.how-calc ol b { color: var(--ink); }
+
+/* ajustes */
+.fixed { display: grid; gap: 6px; padding: 14px 16px; border-radius: 14px; background: var(--card-2); }
+.fixed p { font-weight: 700; }
+.fixed span { color: var(--ink-soft); font-weight: 600; }
+.field { display: grid; gap: 8px; border: 0; margin: 0; padding: 0; min-width: 0; }
+.field > legend, .field > label.lbl { font: 800 1.08rem/1.2 var(--f-display); padding: 0; margin-bottom: 8px; }
+.field > label.lbl { margin-bottom: 0; }
+.opt {
+  display: grid; grid-template-columns: auto 1fr; gap: 2px 10px; align-items: start;
+  padding: 12px 14px;
+  border-radius: 14px;
+  border: 2px solid var(--line);
+  cursor: pointer;
+}
+.opt input { margin: 4px 0 0; accent-color: var(--pen); width: 18px; height: 18px; grid-row: span 2; }
+.opt b { font-weight: 800; }
+.opt span { font-size: .9rem; color: var(--ink-soft); }
+.opt:has(input:checked) { border-color: var(--pen); background: var(--pen-soft); }
+.num {
+  width: 6rem;
+  padding: 9px 6px 6px;
+  border-radius: 12px;
+  border: 2px solid var(--line);
+  background: var(--paper);
+  text-align: center;
+  font: 700 1.3rem/1 var(--f-display);
+}
+.num:focus { outline: none; border-color: var(--pen); box-shadow: 0 0 0 4px var(--pen-soft); }
+.rec-opts { display: grid; gap: 8px; }
+.form-err { padding: 10px 14px; border-radius: 12px; background: var(--bad-bg); color: var(--bad); font-weight: 700; }
+
+/* adicionar */
+.quick { display: flex; flex-wrap: wrap; gap: 8px; }
+.qchip {
+  padding: 8px 14px;
+  border-radius: 999px;
+  border: 2px solid var(--line);
+  background: var(--card-2);
+  font-weight: 700;
+}
+.qchip:hover { border-color: var(--pen); }
+.add-form { display: flex; flex-wrap: wrap; gap: 10px; }
+.add-form input { flex: 1 1 12rem; min-width: 0; padding: 10px 14px; border-radius: 999px; border: 2px solid var(--line); background: var(--paper); font-weight: 700; }
+.add-form input:focus { outline: none; border-color: var(--pen); box-shadow: 0 0 0 4px var(--pen-soft); }
+
+/* toast e confete */
+.toast {
+  position: fixed; left: 50%; bottom: calc(18px + env(safe-area-inset-bottom, 0px)); z-index: 50;
+  max-width: calc(100% - 32px);
+  padding: 10px 18px;
+  border-radius: 999px;
+  background: var(--ink); color: var(--paper);
+  font-weight: 800;
+  transform: translate(-50%, 20px);
+  opacity: 0; pointer-events: none;
+  transition: opacity .2s ease, transform .2s ease;
+}
+.toast.is-on { opacity: 1; transform: translate(-50%, 0); }
+.confetti { position: fixed; inset: 0; width: 100%; height: 100%; pointer-events: none; z-index: 60; }
+
+/* ---------- Abas ---------- */
+.book { display: grid; gap: 26px; }
+.tabs { display: flex; flex-wrap: wrap; gap: 6px; padding-left: 6px; border-bottom: 2px solid var(--edge); }
+.tab {
+  display: inline-flex; align-items: center; gap: 8px;
+  padding: 9px 18px 7px;
+  border: 2px solid var(--edge); border-bottom: 0;
+  border-radius: 14px 14px 0 0;
+  background: var(--card-2);
+  color: var(--ink-soft);
+  font: 800 1.12rem/1.1 var(--f-display);
+  margin-bottom: -2px;
+}
+.tab:hover { color: var(--ink); }
+.tab[aria-selected="true"] { background: var(--paper); color: var(--ink); padding-top: 12px; margin-top: -3px; box-shadow: inset 0 5px 0 var(--hl); }
+.tabs__count {
+  display: inline-grid; place-items: center;
+  min-width: 1.5em; height: 1.5em; padding: 0 .35em;
+  border-radius: 999px;
+  background: var(--bad); color: var(--card);
+  font: 800 .82rem/1 var(--f-body);
+}
+.panel { display: grid; gap: 28px; }
+
+/* ---------- Recuperação ---------- */
+.rec-intro { display: grid; grid-template-columns: minmax(0, 1.2fr) minmax(0, 1fr); gap: 24px; align-items: start; }
+@media (max-width: 820px) { .rec-intro { grid-template-columns: minmax(0, 1fr); } }
+.rec-intro h2 { font: 800 1.7rem/1.1 var(--f-display); margin-bottom: 10px; }
+.rec-intro__txt { display: grid; gap: 16px; }
+.rec-intro__txt > p { color: var(--ink-soft); max-width: 36rem; }
+.qrec {
+  display: grid; gap: 12px;
+  padding: 16px 18px;
+  border-radius: 18px;
+  background: var(--card);
+  border: 2px solid var(--edge);
+  box-shadow: 4px 4px 0 var(--hard);
+}
+.qrec h3 { font: 800 1.2rem/1.1 var(--f-display); }
+.qrec__row { display: flex; flex-wrap: wrap; gap: 12px 20px; align-items: end; }
+.qrec__row label { display: grid; gap: 6px; font-weight: 700; font-size: .9rem; color: var(--ink-soft); }
+.qrec__out { font-size: 1.02rem; }
+.qrec__out b { font: 800 1.3rem/1 var(--f-display); color: var(--pen); }
+.rec-head { font: 800 1.3rem/1.2 var(--f-display); }
+.rec-head small { font: 600 .92rem var(--f-body); color: var(--ink-faint); margin-left: 6px; }
+.rec-list { display: grid; grid-template-columns: repeat(auto-fill, minmax(min(100%, 330px), 1fr)); gap: 18px; }
+.rrow {
+  display: grid; gap: 10px; align-content: start;
+  min-width: 0;
+  padding: 16px 18px;
+  border-radius: 18px;
+  background: var(--card);
+  border: 2px solid var(--edge);
+  box-shadow: 4px 4px 0 var(--hard);
+}
+.rrow.is-hl { outline: 3px solid var(--pen); outline-offset: 3px; }
+.rrow__head { display: flex; align-items: center; gap: 12px; min-width: 0; }
+.rrow__name { font: 700 1.25rem/1.1 var(--f-display); overflow-wrap: anywhere; }
+.rrow__sub { font-size: .9rem; font-weight: 700; color: var(--ink-soft); }
+.rrow__need b, .rrow__post b { font: 800 1.35rem/1 var(--f-display); color: var(--st); }
+.rrow__in { display: flex; flex-wrap: wrap; align-items: center; gap: 10px 14px; padding: 10px 12px; border-radius: 14px; background: var(--st-bg); }
+.rrow__in label { font-weight: 800; }
+.rrow__impact { font-size: .92rem; color: var(--ink-soft); }
+.rrow__impact b { color: var(--ink); }
+.rec-sep { border: 0; border-top: 2px dashed var(--line); margin: 6px 0 0; }
+.rec-also { font-size: .95rem; color: var(--ink-soft); }
+.rec-also b { color: var(--ink); }
+.rec-empty { padding: 22px; border-radius: 18px; border: 2px dashed var(--ink-faint); color: var(--ink-soft); font-weight: 700; text-align: center; }
+.chip small { font-size: .68rem; font-weight: 800; color: var(--ok); text-transform: uppercase; letter-spacing: .03em; }
+.tag--rec { background: var(--ok-bg); color: var(--ok); }
+.tag--btn { border: 0; background: var(--warn-bg); color: var(--warn); cursor: pointer; }
+.tag--btn:hover { text-decoration: underline; }
+
+@media (prefers-reduced-motion: reduce) {
+  *, *::before, *::after { transition: none !important; animation: none !important; }
+}
+</style>
+</head>
+<body>
+<div class="page">
+  <header class="top">
+    <div class="brand">
+      <h1 class="logo">Quanto <mark>falta</mark>?</h1>
+      <span class="scribble" aria-hidden="true">feito pra galera do Mackenzie ✏️</span>
+      <p class="tagline">Coloque suas notas de At1, At2 e APA e descubra a média de cada etapa, a média final e quanto falta pra passar em cada matéria.</p>
+    </div>
+    <button class="rules" type="button" data-do="rules" id="rulesBtn">
+      <span class="rules__k">Regras do Mackenzie</span>
+      <span class="rules__v" id="rulesSummary"></span>
+      <span class="rules__edit">ajustar ✎</span>
+    </button>
+  </header>
+
+  <div class="book">
+  <nav class="tabs" role="tablist" aria-label="Seções">
+    <button class="tab" type="button" role="tab" id="tab-boletim" aria-controls="panel-boletim" aria-selected="true" data-tab="boletim">📒 Boletim</button>
+    <button class="tab" type="button" role="tab" id="tab-rec" aria-controls="panel-rec" aria-selected="false" tabindex="-1" data-tab="recuperacao">🛟 Recuperação <span class="tabs__count" id="recCount" hidden></span></button>
+  </nav>
+
+  <div class="panel" id="panel-boletim" role="tabpanel" aria-labelledby="tab-boletim">
+  <aside class="postit" id="sampleNote" hidden>
+    <p class="postit__hey">Bora começar?</p>
+    <p>Toque numa matéria e coloque suas notas de At1, At2 e APA. O que ainda não aconteceu, deixe em branco: o site mostra quanto você precisa tirar.</p>
+  </aside>
+
+  <section class="summary" id="summary" aria-label="Resumo do ano"></section>
+
+  <section class="grid" id="grid" aria-label="Matérias"></section>
+
+  <section class="how" id="how" aria-labelledby="how-t"></section>
+
+  <section class="tools" aria-label="Ferramentas">
+    <button class="btn" type="button" data-do="copy">Copiar meu boletim</button>
+    <button class="btn btn--ghost" type="button" data-do="askReset">Apagar todas as notas</button>
+    <div class="confirm" id="resetConfirm" hidden>
+      <span>Isso apaga as notas de todas as matérias. Tem certeza?</span>
+      <button class="btn btn--small btn--danger" type="button" data-do="reset">Sim, apagar</button>
+      <button class="btn btn--small btn--ghost" type="button" data-do="cancelReset">Cancelar</button>
+    </div>
+    <div class="copybox" id="copyBox" hidden>
+      <label for="copyText" class="hint">Não deu pra copiar sozinho. Selecione o texto abaixo e copie:</label>
+      <textarea id="copyText" readonly></textarea>
+    </div>
+  </section>
+  </div>
+
+  <div class="panel" id="panel-rec" role="tabpanel" aria-labelledby="tab-rec" hidden>
+    <section class="rec-intro">
+      <div class="rec-intro__txt">
+        <div>
+          <h2>Recuperação da 1ª e da 2ª etapa</h2>
+          <p>Ficou abaixo da média numa etapa? A nota da prova de recuperação faz média com a média da etapa, e o resultado entra no lugar dela na conta da média final.</p>
+        </div>
+        <div class="qrec">
+          <h3>Conta rápida</h3>
+          <div class="qrec__row">
+            <label for="q-m">Média da etapa<input class="grade" id="q-m" inputmode="decimal" autocomplete="off" placeholder="—"></label>
+            <label for="q-p">Nota da prova<input class="grade" id="q-p" inputmode="decimal" autocomplete="off" placeholder="—"></label>
+          </div>
+          <p class="qrec__out" id="q-out" aria-live="polite"></p>
+        </div>
+      </div>
+      <div class="board" id="recBoard"></div>
+    </section>
+    <section class="block" id="recList" aria-live="polite"></section>
+
+    <hr class="rec-sep">
+
+    <section class="rec-intro">
+      <div class="rec-intro__txt">
+        <div>
+          <h2>Recuperação final</h2>
+          <p>Fechou o ano abaixo de 6? Na prova de recuperação final você precisa tirar 6 + o que faltou pra sua média chegar em 6.</p>
+        </div>
+        <div class="qrec">
+          <h3>Conta rápida</h3>
+          <div class="qrec__row">
+            <label for="qf-m">Média final<input class="grade" id="qf-m" inputmode="decimal" autocomplete="off" placeholder="—"></label>
+            <label for="qf-p">Nota da prova<input class="grade" id="qf-p" inputmode="decimal" autocomplete="off" placeholder="—"></label>
+          </div>
+          <p class="qrec__out" id="qf-out" aria-live="polite"></p>
+        </div>
+      </div>
+      <div class="board" id="recFinalBoard"></div>
+    </section>
+    <section class="block" id="recFinalList" aria-live="polite"></section>
+  </div>
+  </div>
+
+  <div class="fine">
+    <p>Suas notas ficam salvas só neste aparelho, neste navegador. Ninguém mais vê.</p>
+    <p>Feito por aluno, pra aluno. Não é um site oficial do Mackenzie: na dúvida, vale o boletim e o regimento da escola.</p>
+  </div>
+</div>
+
+<dialog class="sheet" id="subjectDlg" aria-labelledby="d-name"></dialog>
+<dialog class="sheet sheet--sm" id="rulesDlg" aria-labelledby="r-title"></dialog>
+<dialog class="sheet sheet--sm" id="addDlg" aria-labelledby="a-title"></dialog>
+<div class="toast" id="toast" role="status" aria-live="polite"></div>
+
+<script>
+(function () {
+  'use strict';
+
+  /* ---------- utilidades ---------- */
+  const $ = (s, el) => (el || document).querySelector(s);
+  const $$ = (s, el) => Array.from((el || document).querySelectorAll(s));
+  const esc = (s) => String(s == null ? '' : s).replace(/[&<>"']/g, (c) => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;' }[c]));
+  const uid = () => Math.random().toString(36).slice(2, 9);
+  const sum = (arr) => arr.reduce((t, x) => t + x, 0);
+  const EPS = 1e-7;
+  const KEY = 'quanto-falta-mackenzie:v2';
+  const reduceMotion = () => window.matchMedia && window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+
+  const fmt = (x, d) => {
+    d = d == null ? 2 : d;
+    const p = Math.pow(10, d);
+    let r = Math.round((x + Number.EPSILON) * p) / p;
+    if (Object.is(r, -0)) r = 0;
+    return r.toLocaleString('pt-BR', { maximumFractionDigits: d });
+  };
+  const up1 = (x) => Math.max(0, Math.ceil(x * 10 - 1e-6) / 10);
+  const up2 = (x) => Math.max(0, Math.ceil(x * 100 - 1e-6) / 100);
+  const pctUp = (f) => Math.max(0, Math.ceil(f * 100 - 1e-6));
+  const raw = (n) => String(n).replace('.', ',');
+  const joinPt = (arr) => arr.length <= 1 ? arr.join('') : arr.slice(0, -1).join(', ') + ' e ' + arr[arr.length - 1];
+
+  function parseNum(v) {
+    if (v == null) return null;
+    const s = String(v).trim().replace(',', '.');
+    if (s === '') return null;
+    if (!/^(\d+\.?\d*|\.\d+)$/.test(s)) return NaN;
+    return parseFloat(s);
+  }
+  function readGrade(v) {
+    const n = parseNum(v);
+    if (n === null) return { v: null };
+    if (Number.isNaN(n)) return { v: null, err: 'Só números, tipo 7,5' };
+    if (n > 10 + EPS) return { v: null, err: 'Vai até 10' };
+    return { v: n };
+  }
+
+  /* ---------- regras do Mackenzie ---------- */
+  const N = 3;
+  const ETAPA_W = [2, 2, 3];
+  const W_SUM = 7;
+  // Como a média da etapa é calculada em cada matéria
+  const SCHEMES = {
+    full: {
+      formula: '(At1×4 + At2×4 + APA×2) ÷ 10',
+      acts: [{ k: 'at1', n: 'At1', p: 4, h: 'peso 4' }, { k: 'at2', n: 'At2', p: 4, h: 'peso 4' }, { k: 'apa', n: 'APA', p: 2, h: 'peso 2' }],
+      how: 'Dentro de cada etapa, At1 e At2 contam 40% cada e a APA conta 20%.'
+    },
+    at2apa: {
+      formula: '(At2 + APA) ÷ 2',
+      acts: [{ k: 'at2', n: 'At2', p: 1, h: 'metade' }, { k: 'apa', n: 'APA', p: 1, h: 'metade' }],
+      how: 'Dentro de cada etapa, a At2 e a APA contam metade cada.'
+    },
+    at1apa: {
+      formula: '(At1 + APA) ÷ 2',
+      acts: [{ k: 'at1', n: 'At1', p: 1, h: 'metade' }, { k: 'apa', n: 'APA', p: 1, h: 'metade' }],
+      how: 'Dentro de cada etapa, a At1 e a APA contam metade cada.'
+    }
+  };
+  const schemeOf = (sub) => SCHEMES[sub.scheme] || SCHEMES.full;
+  const ord = (i) => (i + 1) + 'ª';
+
+  const EMOJIS = ['📚', '📝', '➗', '🏛️', '🌎', '🧬', '🧲', '⚗️', '💬', '🗣️', '🎨', '⚽', '🤔', '👥', '🕊️', '🧭', '🩺', '🏙️', '📣', '💰', '📐', '🎵', '💻', '⭐'];
+  // Matérias da escola, em ordem alfabética
+  // Matérias que todo mundo tem (já aparecem no site)
+  const SUBJECTS = [
+    ['Arte', '🎨'], ['Biologia', '🧬'], ['Educação Física', '⚽'], ['Ensino Religioso', '🕊️'],
+    ['Espanhol', '🗣️'], ['Filosofia', '🤔'], ['Física', '🧲'], ['Geografia', '🌎'],
+    ['História', '🏛️'], ['Inglês', '💬'], ['Matemática', '➗'], ['Português e Literatura', '📚'],
+    ['Produção Textual', '📝', 'at1apa'], ['Projeto de Vida', '🧭'], ['Química', '⚗️'], ['Sociologia', '👥']
+  ];
+  // Trilhas: só aparecem se a pessoa adicionar
+  const TRILHAS = [
+    ['Educação Financeira', '💰', 'at2apa'], ['Marketing', '📣', 'at2apa'],
+    ['Saúde', '🩺', 'at2apa'], ['Urbanismo e Cidadania', '🏙️', 'at2apa']
+  ];
+  const QUICK = SUBJECTS.concat(TRILHAS);
+  // compara nomes sem acento, sem maiúscula e sem o número da série no fim ("Saúde 3" = "saude")
+  const baseName = (n) => String(n || '').normalize('NFD').replace(/[\u0300-\u036f]/g, '').toLowerCase().trim().replace(/\s+\d+$/, '');
+  const isTrilha = (name) => TRILHAS.some((t) => baseName(t[0]) === baseName(name));
+  // trilha sempre com o nome sem número: "Marketing 3" vira "Marketing"
+  const canonName = (name) => { const t = TRILHAS.find((x) => baseName(x[0]) === baseName(name)); return t ? t[0] : String(name || '').trim(); };
+  const defaultScheme = (name) => { const r = QUICK.find((x) => baseName(x[0]) === baseName(name)); return (r && r[2]) || 'full'; };
+  const BASE_RULES = { pass: 6 };
+  const STATUS = {
+    vazio:     { face: '✏️', t: 'Sem notas ainda', tone: 'none' },
+    tranquilo: { face: '😎', t: 'Tranquilo', tone: 'go' },
+    caminho:   { face: '🙂', t: 'No caminho', tone: 'go' },
+    atencao:   { face: '😬', t: 'Atenção', tone: 'warn' },
+    corre:     { face: '🔥', t: 'Corre!', tone: 'hot' },
+    rec:       { face: '🆘', t: 'Recuperação', tone: 'bad' },
+    garantido: { face: '🎉', t: 'Já garantiu!', tone: 'ok' },
+    aprovado:  { face: '🏆', t: 'Aprovado!', tone: 'ok' },
+    aprovadoRec: { face: '🏆', t: 'Passou na recuperação!', tone: 'ok' }
+  };
+  const PASSED = ['garantido', 'aprovado', 'aprovadoRec'];
+  const PENDING = ['tranquilo', 'caminho', 'atencao', 'corre'];
+
+  /* ---------- estado ---------- */
+  const E = (at1, at2, apa) => ({ at1: at1 || '', at2: at2 || '', apa: apa || '', v: '', direct: false, rec: '' });
+  const blankEtapa = () => E();
+  function newSubject(name, emoji, color, scheme) { return { id: uid(), name: name, emoji: emoji, color: color, scheme: SCHEMES[scheme] ? scheme : defaultScheme(name), etapas: [0, 1, 2].map(blankEtapa), recFinal: '' }; }
+
+  function defaultState() {
+    const subjects = SUBJECTS.map((row, idx) => newSubject(row[0], row[1], idx % 8, row[2]));
+    return { v: 1, listV: 2, rules: Object.assign({}, BASE_RULES), subjects: subjects };
+  }
+
+  function normalize(s) {
+    const r = { pass: +((s.rules || {}).pass) };
+    r.pass = +r.pass > 0 && +r.pass <= 10 ? +r.pass : 6;
+    const str = (x) => String(x == null ? '' : x);
+    const subjects = (Array.isArray(s.subjects) ? s.subjects : []).filter(Boolean).map(function (x, idx) {
+      return {
+        id: x.id || uid(),
+        name: canonName(str(x.name)) || 'Matéria',
+        emoji: x.emoji || '📘',
+        color: Number.isInteger(x.color) ? Math.abs(x.color) % 8 : idx % 8,
+        scheme: SCHEMES[x.scheme] ? x.scheme : defaultScheme(x.name),
+        recFinal: str(x.recFinal),
+        etapas: [0, 1, 2].map(function (i) {
+          const e = (x.etapas || [])[i] || {};
+          return { at1: str(e.at1), at2: str(e.at2), apa: str(e.apa), v: str(e.v), direct: !!e.direct, rec: i < 2 ? str(e.rec) : '' };
+        })
+      };
+    });
+    const blank = (x) => !x.recFinal.trim() && x.etapas.every((e) => ![e.at1, e.at2, e.apa, e.v, e.rec].some((v) => v.trim()));
+    const list = s.listV === 2 ? subjects : subjects.filter((x) => !(isTrilha(x.name) && blank(x)));
+    return { v: 1, listV: 2, rules: r, subjects: list };
+  }
+  function load() {
+    try {
+      const txt = localStorage.getItem(KEY);
+      if (txt) { const s = JSON.parse(txt); if (s && s.rules && Array.isArray(s.subjects)) return normalize(s); }
+    } catch (e) { /* sem armazenamento: segue com o exemplo */ }
+    return defaultState();
+  }
+  function save() { try { localStorage.setItem(KEY, JSON.stringify(S)); } catch (e) { /* ignora */ } }
+
+  let S = load();
+  let openId = null;
+  let lastDetailSt = null;
+  let prevSt = {};
+  let userEdited = false;
+  let draft = null;
+  const getSub = (id) => S.subjects.find((x) => x.id === id);
+
+  function rulesSummary() {
+    return 'Etapas com peso 2, 2 e 3 · At1, At2 e APA · média ' + fmt(S.rules.pass) + ' pra passar';
+  }
+
+  /* ---------- a conta ---------- */
+  function etapaModel(sub, i) {
+    const et = sub.etapas[i];
+    const base = ETAPA_W[i] / W_SUM;
+    const sc = schemeOf(sub);
+    const PS = sum(sc.acts.map((a) => a.p));
+    const out = { i: i, slots: [], errs: {}, direct: !!et.direct, PS: PS };
+    if (et.direct) {
+      const g = readGrade(et.v);
+      if (g.err) out.errs.v = g.err;
+      out.slots.push({ i: i, k: 'v', c: base, m: 10, v: g.v, p: PS });
+    } else {
+      sc.acts.forEach(function (a) {
+        const g = readGrade(et[a.k]);
+        if (g.err) out.errs[a.k] = g.err;
+        out.slots.push({ i: i, k: a.k, c: base * a.p / PS, m: 10, v: g.v, p: a.p });
+      });
+    }
+    const kn = out.slots.filter((x) => x.v != null);
+    out.known = kn.length === out.slots.length;
+    out.anyKnown = kn.length > 0;
+    const kp = sum(kn.map((x) => x.p));
+    out.partial = kp > 0 ? sum(kn.map((x) => x.p * x.v)) / kp : null;
+    out.value = out.known ? sum(out.slots.map((x) => x.p * x.v)) / PS : null;
+    out.pre = out.value;
+    out.recV = null;
+    // Recuperação da 1ª e 2ª etapa: (média da etapa + prova) ÷ 2
+    if (i < 2) {
+      const g = readGrade(et.rec);
+      if (g.err) out.errs.rec = g.err;
+      if (g.v != null && out.known) {
+        out.recV = g.v;
+        out.value = (out.pre + g.v) / 2;
+        out.slots.forEach((x) => { x.c /= 2; });
+        out.slots.push({ i: i, k: 'rec', c: base / 2, m: 10, v: g.v, p: 0 });
+      }
+    }
+    return out;
+  }
+  function analyzeWith(sub, i, recRaw) {
+    return analyze(Object.assign({}, sub, { etapas: sub.etapas.map((et, j) => (j === i ? Object.assign({}, et, { rec: recRaw }) : et)) }));
+  }
+
+  function analyze(sub) {
+    const R = S.rules;
+    const ets = [];
+    const slots = [];
+    for (let i = 0; i < N; i++) { const e = etapaModel(sub, i); ets.push(e); e.slots.forEach((x) => slots.push(x)); }
+    let K = 0, Kmax = 0, Rem = 0;
+    slots.forEach(function (s) { if (s.v != null) { K += s.c * s.v; Kmax += s.c * s.m; } else Rem += s.c * s.m; });
+    const T = R.pass;
+    const need = T - K;
+    let st, f = null;
+    if (Kmax < EPS) { st = 'vazio'; f = T / Rem; }
+    else if (Rem < EPS) st = K >= T - EPS ? 'aprovado' : 'rec';
+    else if (need <= EPS) st = 'garantido';
+    else {
+      f = need / Rem;
+      st = f <= 0.5 + EPS ? 'tranquilo' : f <= 0.7 + EPS ? 'caminho' : f <= 0.9 + EPS ? 'atencao' : f <= 1 + EPS ? 'corre' : 'rec';
+    }
+    const ff = (st === 'vazio' || PENDING.indexOf(st) >= 0) && f != null ? Math.min(1, f) : null;
+    let rec = null;
+    // Recuperação final: precisa de 6 + o que faltou pra média chegar em 6
+    if (st === 'rec' && Rem < EPS) {
+      const nr = 2 * T - K;
+      const g = readGrade(sub.recFinal);
+      rec = { need: nr, show: up2(nr), faltou: up2(nr) - T, possible: nr <= 10 + EPS, got: g.v, err: g.err || null };
+      if (g.v != null && g.v >= nr - EPS) st = 'aprovadoRec';
+    }
+    const errors = ets.some((e) => Object.keys(e.errs).length > 0) || !!(rec && rec.err);
+    return { ets: ets, K: K, Kmax: Kmax, Rem: Rem, T: T, need: need, f: f, ff: ff, st: st, rec: rec, avg: Kmax > EPS ? K / Kmax * 10 : null, errors: errors };
+  }
+
+  function statusOf(a) {
+    if (a.st === 'rec' && a.rec && a.rec.got != null) return { face: '😕', t: 'Não deu na recuperação', tone: 'bad' };
+    return STATUS[a.st];
+  }
+
+  function pendingWhere(a) {
+    const pend = a.ets.filter((e) => !e.known);
+    const whole = pend.every((e) => !e.anyKnown);
+    if (whole && pend.length === 1) return 'na ' + ord(pend[0].i) + ' etapa';
+    if (whole) return 'em cada etapa que falta';
+    return 'em tudo que falta';
+  }
+
+  function etapaTarget(a, e) {
+    const kn = e.slots.filter((s) => s.v != null);
+    const pend = e.slots.filter((s) => s.v == null);
+    return (sum(kn.map((s) => s.p * s.v)) + a.ff * 10 * sum(pend.map((s) => s.p))) / e.PS;
+  }
+
+  /* ---------- textos ---------- */
+  function bigHtml(a) {
+    const T = fmt(S.rules.pass);
+    let pre = '', val = '', post = '', word = false;
+    if (a.st === 'vazio') { pre = 'precisa de'; val = fmt(up1(a.ff * 10), 1); post = 'em cada etapa'; }
+    else if (PENDING.indexOf(a.st) >= 0) { pre = 'precisa de'; val = fmt(up1(a.ff * 10), 1); post = pendingWhere(a); }
+    else if (a.st === 'garantido') { pre = 'pela média'; val = 'já passou'; word = true; post = 'média até agora ' + fmt(a.avg); }
+    else if (a.st === 'aprovado') { pre = 'média final'; val = fmt(a.K); }
+    else if (a.st === 'aprovadoRec') { pre = 'recuperação final'; val = 'passou'; word = true; post = 'tirou ' + fmt(a.rec.got) + ', precisava de ' + fmt(a.rec.show); }
+    else if (a.Rem > EPS) { pre = 'mesmo com 10 em tudo, chega em'; val = fmt(a.K + a.Rem); post = 'precisa de ' + T; }
+    else if (a.rec.possible) { pre = a.rec.got != null ? 'na recuperação final precisava de' : 'na recuperação final precisa de'; val = fmt(a.rec.show); post = 'média do ano ' + fmt(a.K); }
+    else { pre = 'média final'; val = fmt(a.K); post = 'nem com 10 na recuperação final dá'; }
+    return '<span class="big"><span class="big__pre">' + pre + '</span><span class="big__row"><strong class="' + (word ? 'is-word' : '') + '">' + val + '</strong>' + (post ? '<span class="big__post">' + post + '</span>' : '') + '</span></span>';
+  }
+
+  function verdictText(a) {
+    const R = S.rules;
+    const T = fmt(R.pass);
+    const tone = {
+      tranquilo: 'Tá tranquilo, dá pra passar sem sufoco.',
+      caminho: 'Tá no caminho certo, é só manter o ritmo.',
+      atencao: 'Vai precisar caprichar no que falta.',
+      corre: 'Tá apertado: precisa de quase tudo que falta.'
+    };
+    if (a.st === 'vazio') return 'Ainda não tem nota aqui. Pra passar com média ' + T + ', você precisa de <b>' + fmt(up1(a.ff * 10), 1) + '</b> em cada etapa. E lembra: a 3ª etapa tem peso 3, então ela ajuda (ou atrapalha) mais.';
+    if (PENDING.indexOf(a.st) >= 0) return 'Pra fechar com média ' + T + ', você precisa tirar pelo menos <b>' + fmt(up1(a.ff * 10), 1) + '</b> ' + pendingWhere(a) + '. ' + tone[a.st];
+    if (a.st === 'garantido') return 'Mesmo se tirar 0 em tudo que falta, sua média final fica em <b>' + fmt(a.K) + '</b>. Pela nota, você já passou! Só não esquece que a frequência também conta.';
+    if (a.st === 'aprovado') return 'Sua média final é <b>' + fmt(a.K) + '</b>. Passou!';
+    if (a.Rem > EPS) return 'Mesmo tirando 10 em tudo que falta, a média chega só em <b>' + fmt(a.K + a.Rem) + '</b>, e precisa de ' + T + '. Vai precisar da recuperação final, onde você precisa de ' + T + ' + o que faltar pra ' + T + '. Cada ponto agora deixa ela mais fácil.';
+    if (a.st === 'aprovadoRec') return 'Sua média do ano ficou em ' + fmt(a.K) + ' e na recuperação final você precisava de ' + fmt(a.rec.show) + '. Tirou <b>' + fmt(a.rec.got) + '</b>: passou!';
+    const t = 'Sua média final ficou em <b>' + fmt(a.K) + '</b>, abaixo de ' + T + '. Faltou ' + fmt(a.rec.faltou) + ', então na recuperação final você precisa de ' + T + ' + ' + fmt(a.rec.faltou) + ' = <b>' + fmt(a.rec.show) + '</b>.';
+    if (!a.rec.possible) return t + ' Como passa de 10, vale conversar com o professor ou a coordenação.';
+    if (a.rec.got != null) return t + ' Você colocou ' + fmt(a.rec.got) + ' na prova: faltou ' + fmt(a.rec.need - a.rec.got) + '. Vale conversar com o professor ou a coordenação.';
+    return t;
+  }
+
+  function shortLine(a) {
+    if (a.st === 'vazio') return 'sem notas ainda';
+    if (PENDING.indexOf(a.st) >= 0) return 'precisa de ' + fmt(up1(a.ff * 10), 1) + ' ' + pendingWhere(a);
+    if (a.st === 'garantido') return 'já garantiu';
+    if (a.st === 'aprovado') return 'aprovado com média ' + fmt(a.K);
+    if (a.st === 'aprovadoRec') return 'passou na recuperação final';
+    if (a.Rem > EPS) return 'vai precisar de recuperação final';
+    if (!a.rec.possible) return 'média final ' + fmt(a.K) + ', nem com 10 na recuperação final dá';
+    return (a.rec.got != null ? 'precisava de ' : 'precisa de ') + fmt(a.rec.show) + ' na recuperação final';
+  }
+
+  function thermoHtml(a, big) {
+    const p = (x) => Math.max(0, Math.min(100, x * 10));
+    const got = p(a.K), left = p(a.Rem), pass = p(a.T);
+    return '<span class="thermo' + (big ? ' thermo--big' : '') + '" aria-hidden="true">'
+      + '<span class="thermo__track"><span class="thermo__got" style="width:' + got.toFixed(2) + '%"></span>'
+      + '<span class="thermo__left" style="left:' + got.toFixed(2) + '%;width:' + left.toFixed(2) + '%"></span></span>'
+      + '<span class="thermo__pass" style="left:' + pass.toFixed(2) + '%"><span>' + fmt(a.T) + '</span></span></span>';
+  }
+
+  function legendHtml(a) {
+    return '<div class="legend">'
+      + '<span><i class="sw sw--got"></i>já garantiu <b>' + fmt(a.K) + '</b></span>'
+      + (a.Rem > EPS ? '<span><i class="sw sw--left"></i>ainda dá pra ganhar <b>' + fmt(a.Rem) + '</b></span>' : '')
+      + '<span><i class="sw sw--pass"></i>passa com <b>' + fmt(a.T) + '</b></span></div>';
+  }
+
+  function etapaVal(e) {
+    if (e.known) return fmt(e.value, 1);
+    if (e.anyKnown) return fmt(e.partial, 1) + '…';
+    return '—';
+  }
+
+  /* ---------- tela principal ---------- */
+  function cardHtml(sub, a) {
+    const s = statusOf(a);
+    const chips = a.ets.map((e) => '<span class="chip' + (e.known ? '' : e.anyKnown ? ' chip--partial' : ' chip--empty') + '"><i>' + ord(e.i) + '</i>' + etapaVal(e) + (e.recV != null ? '<small>rec</small>' : '') + '</span>').join('');
+    return '<button type="button" class="card t-' + s.tone + '" data-open="' + sub.id + '" style="--c: var(--s' + sub.color + ')">'
+      + '<span class="card__tape" aria-hidden="true"></span>'
+      + '<span class="card__top"><span class="card__emoji" aria-hidden="true">' + esc(sub.emoji) + '</span><span class="card__name">' + (esc(sub.name.trim()) || 'Sem nome') + '</span></span>'
+      + '<span class="pill"><span aria-hidden="true">' + s.face + '</span>' + s.t + '</span>'
+      + bigHtml(a)
+      + thermoHtml(a, false)
+      + '<span class="card__chips">' + chips + '</span>'
+      + (a.errors ? '<span class="card__warn">⚠️ tem nota pra conferir</span>' : '')
+      + '</button>';
+  }
+
+  function renderSummary(list) {
+    const groups = [
+      ['ok', 'garantidas', 'garantida', (st) => PASSED.indexOf(st) >= 0],
+      ['go', 'tranquilas', 'tranquila', (st) => st === 'tranquilo' || st === 'caminho'],
+      ['warn', 'pedindo atenção', 'pedindo atenção', (st) => st === 'atencao' || st === 'corre'],
+      ['bad', 'em recuperação', 'em recuperação', (st) => st === 'rec'],
+      ['none', 'sem notas', 'sem notas', (st) => st === 'vazio']
+    ];
+    const chips = groups.map(function (g) {
+      const n = list.filter((x) => g[3](x.a.st)).length;
+      if (!n) return '';
+      return '<li class="t-' + g[0] + '"><b>' + n + '</b>' + (n === 1 ? g[2] : g[1]) + '</li>';
+    }).join('');
+    const avgs = list.map((x) => x.a.avg).filter((v) => v != null);
+    const avgTxt = avgs.length ? '<p class="sum__avg">Média geral até agora<b>' + fmt(sum(avgs) / avgs.length, 1) + '</b></p>' : '';
+    $('#summary').innerHTML = '<p class="sum__lead">' + list.length + (list.length === 1 ? ' matéria' : ' matérias') + '</p><ul class="sum__chips">' + chips + '</ul>' + avgTxt;
+  }
+
+  function renderHow() {
+    const T = S.rules.pass;
+    const groups = { at2apa: [], at1apa: [] };
+    S.subjects.forEach((s) => { if (groups[s.scheme]) groups[s.scheme].push(esc(s.name.trim() || 'Sem nome')); });
+    const others = Object.keys(groups).filter((k) => groups[k].length);
+    const steps = [
+      '<b>Média da etapa:</b> ' + (others.length ? 'na maioria das matérias, ' : '') + 'At1 e At2 têm peso 4 e a APA tem peso 2: multiplica cada nota pelo peso, soma e divide por 10.'
+        + others.map((k) => ' Em ' + joinPt(groups[k]) + ', é ' + SCHEMES[k].formula + '.').join(''),
+      '<b>Média final:</b> a 1ª e a 2ª etapa têm peso 2, e a 3ª tem peso 3. Multiplica cada média pelo peso, soma e divide por 7.',
+      '<b>Quanto falta:</b> o site vê quanto da média final você já garantiu, quanto falta pra chegar em ' + fmt(T) + ' e quanto ainda dá pra ganhar. Dividindo um pelo outro, sai a nota que você precisa em tudo que falta.'
+    ];
+    // exemplo: média 5 na 1ª e 7 na 2ª
+    const exNeed = (W_SUM * T - (2 * 5 + 2 * 7)) / 3;
+    let ex = 'Exemplo: média 5 na 1ª etapa e 7 na 2ª. ';
+    ex += exNeed <= EPS ? 'Já passou, mesmo com 0 na 3ª.' : exNeed > 10 + EPS ? 'Nem com 10 na 3ª dá.' : 'Pra passar, precisa de <b>' + fmt(up1(exNeed), 1) + '</b> na 3ª etapa.';
+    const topNeed = (W_SUM * T - 40) / 3;
+    const fun = topNeed > EPS
+      ? 'Curiosidade: a 3ª etapa vale quase metade da média (3 de 7). Mesmo com 10 nas duas primeiras, ainda precisa de <b>' + fmt(up1(topNeed), 1) + '</b> na 3ª.'
+      : 'Curiosidade: a 3ª etapa vale quase metade da média (3 de 7).';
+    $('#how').innerHTML = '<div><h2 id="how-t">Como a conta funciona</h2><ol class="steps">' + steps.map((s) => '<li>' + s + '</li>').join('') + '</ol></div>'
+      + '<div class="board"><p class="board__t">a conta do Mackenzie</p>'
+      + '<p class="board__f">etapa = (At1×4 + At2×4 + APA×2) ÷ 10</p>'
+      + (others.length ? '<p class="board__ex">Em algumas matérias: ' + others.map((k) => SCHEMES[k].formula).join(' ou ') + '.</p>' : '')
+      + '<p class="board__f">final = (1ª×2 + 2ª×2 + 3ª×3) ÷ 7</p>'
+      + '<p class="board__ex">' + ex + '</p><p class="board__ex">' + fun + '</p></div>';
+  }
+
+  function renderMain() {
+    $('#rulesSummary').textContent = rulesSummary();
+    $('#sampleNote').hidden = S.subjects.some((s) => s.etapas.some((e) => (e.direct ? [e.v] : [e.at1, e.at2, e.apa]).some((x) => x.trim())));
+    const list = S.subjects.map((sub) => ({ sub: sub, a: analyze(sub) }));
+    renderSummary(list);
+    $('#grid').innerHTML = list.map((x) => cardHtml(x.sub, x.a)).join('')
+      + '<button type="button" class="card card--add" data-do="add"><span class="plus" aria-hidden="true">+</span><span>Adicionar matéria</span></button>';
+    renderHow();
+    const pend = recRows().filter((r) => r.e.recV == null && r.e.known).length + finalRows().filter((r) => r.a.rec.got == null).length;
+    const rc = $('#recCount');
+    rc.hidden = !pend;
+    rc.textContent = pend;
+    rc.setAttribute('aria-label', pend + (pend === 1 ? ' recuperação sem nota da prova' : ' recuperações sem nota da prova'));
+    const rp = $('#panel-rec');
+    if (!rp.hidden && !rp.contains(document.activeElement)) renderRec();
+    const next = {};
+    let party = false;
+    list.forEach(function (x) {
+      next[x.sub.id] = x.a.st;
+      const was = prevSt[x.sub.id];
+      const ok = PASSED.indexOf(x.a.st) >= 0;
+      if (userEdited && ok && was && PASSED.indexOf(was) < 0) party = true;
+    });
+    prevSt = next;
+    userEdited = false;
+    if (party) confetti();
+  }
+
+  /* ---------- folha da matéria ---------- */
+  function etapaHtml(sub, i) {
+    const et = sub.etapas[i];
+    const field = et.direct
+      ? '<label class="etapa__lbl" for="ev-' + i + '">média</label><input id="ev-' + i + '" class="grade" data-k="v" data-i="' + i + '" inputmode="decimal" autocomplete="off" placeholder="—" value="' + esc(et.v) + '" aria-label="Média da ' + ord(i) + ' etapa" aria-describedby="ee-' + i + '">'
+      : '<span class="etapa__lbl" aria-hidden="true">média</span><output class="grade grade--calc" id="ec-' + i + '" aria-label="Média da ' + ord(i) + ' etapa">—</output>';
+    const sc = schemeOf(sub);
+    const body = et.direct
+      ? '<p class="err-inline" id="ee-' + i + '" hidden></p><button type="button" class="linkish" data-do="useActs" data-i="' + i + '">Calcular pela ' + joinPt(sc.acts.map((a) => a.n)) + '</button>'
+      : '<div class="acts3" style="--cols: ' + sc.acts.length + '">' + sc.acts.map((a) => '<div class="act3">'
+          + '<label class="act3__n" for="a-' + i + '-' + a.k + '">' + a.n + '<small>' + a.h + '</small></label>'
+          + '<input id="a-' + i + '-' + a.k + '" class="grade" data-k="' + a.k + '" data-i="' + i + '" inputmode="decimal" autocomplete="off" placeholder="—" value="' + esc(et[a.k]) + '" aria-label="' + a.n + ' da ' + ord(i) + ' etapa">'
+          + '<div class="act3__out" id="ao-' + i + '-' + a.k + '"></div></div>').join('') + '</div>'
+        + '<button type="button" class="linkish" data-do="useDirect" data-i="' + i + '">Só sei a média da etapa</button>';
+    return '<div class="etapa">'
+      + '<div class="etapa__row"><div class="etapa__name">' + ord(i) + ' etapa<small>peso ' + ETAPA_W[i] + ' na média final</small></div>'
+      + '<div class="etapa__field">' + field + '<span class="grade__max">/10</span></div>'
+      + '<div class="etapa__out" id="eo-' + i + '"></div></div>'
+      + body + '</div>';
+  }
+  function etapasHtml(sub) { let h = ''; for (let i = 0; i < N; i++) h += etapaHtml(sub, i); return h; }
+
+  function renderDetail() {
+    const sub = getSub(openId);
+    if (!sub) return;
+    const a = analyze(sub);
+    const start = a.ff != null ? Math.min(10, Math.ceil(a.ff * 10 * 2 - 1e-6) / 2) : 7;
+    const dlg = $('#subjectDlg');
+    dlg.innerHTML = '<header class="sheet__head" style="--c: var(--s' + sub.color + ')">'
+      + '<button type="button" class="emoji-btn" data-do="emoji" aria-label="Trocar emoji e cor" aria-expanded="false" aria-controls="d-emojis">' + esc(sub.emoji) + '</button>'
+      + '<input id="d-name" class="name-input" data-k="name" value="' + esc(sub.name) + '" aria-label="Nome da matéria" autocomplete="off" maxlength="40">'
+      + '<button type="button" class="x" data-do="close" aria-label="Fechar">×</button>'
+      + '</header>'
+      + '<div class="sheet__main">'
+      + '<div class="emoji-pick" id="d-emojis" hidden>' + EMOJIS.map((e) => '<button type="button" data-pick="' + e + '" aria-pressed="' + (e === sub.emoji) + '" aria-label="Usar ' + e + '">' + e + '</button>').join('')
+      + '<div class="colors">' + [0, 1, 2, 3, 4, 5, 6, 7].map((c) => '<button type="button" data-color="' + c + '" style="--c: var(--s' + c + ')" aria-pressed="' + (c === sub.color) + '" aria-label="Cor ' + (c + 1) + '"></button>').join('') + '</div></div>'
+      + '<section class="block" id="d-verdict" aria-live="polite"></section>'
+      + '<section class="block"><h3 class="block__t">Notas de cada etapa<small>de 0 a 10 · deixe em branco o que ainda não aconteceu</small></h3>'
+      + '<div class="scheme" role="radiogroup" aria-label="Como é a média da etapa nessa matéria"><span class="scheme__lbl">Média da etapa</span>'
+      + Object.keys(SCHEMES).map((k) => '<label class="scheme__o"><input type="radio" name="d-scheme" id="d-sc-' + k + '" value="' + k + '"' + (schemeOf(sub) === SCHEMES[k] ? ' checked' : '') + '><span>' + SCHEMES[k].formula + '</span></label>').join('')
+      + '</div><div id="d-etapas">' + etapasHtml(sub) + '</div></section>'
+      + '<section class="block sim" id="d-sim">'
+      + '<h3 class="block__t">E se…?</h3>'
+      + '<label class="sim__q" for="d-slider">Se você tirar <b id="d-simv"></b> em tudo que falta…</label>'
+      + '<input type="range" id="d-slider" min="0" max="10" step="0.5" value="' + start + '">'
+      + '<div class="sim__scale" aria-hidden="true"><span>0</span><span>5</span><span>10</span></div>'
+      + '<p class="sim__a" id="d-sima"></p>'
+      + '</section>'
+      + '<details class="block how-calc" id="d-how"><summary>Como chegamos nesse número?</summary><div id="d-howb"></div></details>'
+      + '</div>'
+      + '<footer class="sheet__foot sheet__foot--split">'
+      + '<button type="button" class="btn btn--ghost btn--small" data-do="askDel">Remover matéria</button>'
+      + '<div class="confirm" id="d-delc" hidden><span>Remover ' + (esc(sub.name.trim()) || 'essa matéria') + ' e todas as notas dela?</span>'
+      + '<button type="button" class="btn btn--small btn--danger" data-do="del">Sim, remover</button>'
+      + '<button type="button" class="btn btn--small btn--ghost" data-do="cancelDel">Cancelar</button></div>'
+      + '<button type="button" class="btn btn--primary" data-do="close">Pronto</button>'
+      + '</footer>';
+    lastDetailSt = null;
+    refreshDetail();
+  }
+
+  function setInvalid(el, bad) { if (el) el.setAttribute('aria-invalid', bad ? 'true' : 'false'); }
+
+  function needMini(a) {
+    if (a.st === 'garantido') return '';
+    if (a.st === 'rec' && a.Rem > EPS) return '<span class="need">dá o<b>máximo</b></span>';
+    if (a.ff == null) return '';
+    return '<span class="need">precisa de<b>' + fmt(up1(a.ff * 10), 1) + '</b></span>';
+  }
+
+  function refreshDetail() {
+    const sub = getSub(openId);
+    if (!sub) return;
+    const dlg = $('#subjectDlg');
+    const a = analyze(sub);
+    const s = statusOf(a);
+    dlg.className = 'sheet t-' + s.tone;
+
+    const passed = PASSED.indexOf(a.st) >= 0;
+    const anim = passed && lastDetailSt !== null && lastDetailSt !== a.st && !reduceMotion();
+    lastDetailSt = a.st;
+    $('#d-verdict').innerHTML = '<div class="verdict"><div class="verdict__face" aria-hidden="true">' + s.face + '</div>'
+      + '<div class="verdict__body"><p class="verdict__title">' + s.t + '</p><p class="verdict__text">' + verdictText(a) + '</p></div>'
+      + (passed ? '<span class="stamp' + (anim ? ' stamp--in' : '') + '" aria-hidden="true">' + (a.st === 'garantido' ? 'Garantido' : 'Aprovado') + '</span>' : '')
+      + '</div>' + thermoHtml(a, true) + legendHtml(a);
+
+    a.ets.forEach(function (e) {
+      const out = $('#eo-' + e.i, dlg);
+      if (!out) return;
+      let tag = '';
+      if (e.direct) {
+        setInvalid($('#ev-' + e.i, dlg), !!e.errs.v);
+        const ee = $('#ee-' + e.i, dlg);
+        ee.hidden = !e.errs.v;
+        ee.textContent = e.errs.v || '';
+        if (!e.known && !e.errs.v) {
+          if (a.ff != null) tag = '<span class="tag">precisa de <b>' + fmt(up1(a.ff * 10), 1) + '</b></span>';
+          else if (a.st === 'rec' && a.Rem > EPS) tag = '<span class="tag">dá o máximo 💪</span>';
+        }
+      } else {
+        const calc = $('#ec-' + e.i, dlg);
+        if (e.known) calc.innerHTML = fmt(e.pre);
+        else if (e.anyKnown) calc.innerHTML = fmt(e.partial, 1) + '<small>parcial</small>';
+        else calc.textContent = '—';
+        if (!e.known) {
+          if (a.ff != null) tag = '<span class="tag">precisa fechar com <b>' + fmt(up1(etapaTarget(a, e)), 1) + '</b></span>';
+          else if (a.st === 'rec' && a.Rem > EPS) tag = '<span class="tag">dá o máximo 💪</span>';
+        }
+        schemeOf(sub).acts.forEach(function (ac) {
+          const err = e.errs[ac.k];
+          setInvalid($('#a-' + e.i + '-' + ac.k, dlg), !!err);
+          const ao = $('#ao-' + e.i + '-' + ac.k, dlg);
+          const slot = e.slots.find((x) => x.k === ac.k);
+          ao.innerHTML = err ? '<span class="err-inline">' + esc(err) + '</span>' : (slot.v == null ? needMini(a) : '');
+        });
+      }
+      if (e.known) {
+        if (e.recV != null) tag = '<span class="tag tag--rec">pós recuperação: <b>' + fmt(e.value) + '</b></span>';
+        else if (e.i < 2 && e.pre < S.rules.pass - EPS) tag = '<button type="button" class="tag tag--btn" data-do="goRec" data-i="' + e.i + '">fazer a conta da recuperação ›</button>';
+      }
+      out.innerHTML = tag;
+    });
+
+    updateSim(a);
+    const how = howCalcHtml(a, sub);
+    $('#d-howb', dlg).innerHTML = how;
+    $('#d-how', dlg).hidden = !how;
+  }
+
+  function updateSim(a) {
+    const sim = $('#d-sim');
+    if (!sim) return;
+    sim.hidden = a.Rem < EPS;
+    if (sim.hidden) return;
+    const val = +$('#d-slider').value;
+    const F = a.K + (val / 10) * a.Rem;
+    const pass = F >= a.T - EPS;
+    $('#d-simv').textContent = fmt(val, 1);
+    const ans = $('#d-sima');
+    ans.className = 'sim__a t-' + (pass ? 'ok' : 'bad');
+    ans.innerHTML = '…sua média final fica <b>' + fmt(F) + '</b> ' + (pass ? '✅ e você passa!' : '❌ e ainda não passa.');
+  }
+
+  function howCalcHtml(a, sub) {
+    const parts = ['A 1ª e a 2ª etapa valem 2/7 da média final cada, e a 3ª vale 3/7. ' + schemeOf(sub).how];
+    if (a.Kmax > EPS) parts.push('Com as notas que você já tem, sua média final já juntou <b>' + fmt(a.K) + '</b> dos <b>' + fmt(a.T) + '</b> que precisa.');
+    if (a.ff != null && a.Kmax > EPS) {
+      parts.push('Faltam <b>' + fmt(a.need) + '</b>. Tudo que ainda falta fazer pode render até <b>' + fmt(a.Rem) + '</b> na média.');
+      parts.push(fmt(a.need) + ' ÷ ' + fmt(a.Rem) + ' = <b>' + pctUp(a.ff) + '%</b> do que falta. Ou seja: nota <b>' + fmt(up1(a.ff * 10), 1) + '</b> em tudo.');
+    }
+    if (parts.length < 2) return '';
+    return '<ol>' + parts.map((p) => '<li>' + p + '</li>').join('') + '</ol>';
+  }
+
+  function openDetail(id) {
+    openId = id;
+    renderDetail();
+    const dlg = $('#subjectDlg');
+    if (!dlg.open) dlg.showModal();
+    dlg.scrollTop = 0;
+  }
+
+  function rerenderEtapas(focusSel) {
+    const sub = getSub(openId);
+    $('#d-etapas').innerHTML = etapasHtml(sub);
+    refreshDetail();
+    if (focusSel) { const el = $(focusSel, $('#subjectDlg')); if (el) { el.focus(); if (el.select) el.select(); } }
+  }
+
+  /* ---------- ajustes ---------- */
+  function renderRules(focusId) {
+    const d = draft;
+    $('#rulesDlg').innerHTML = '<header class="sheet__head"><h2 id="r-title">Regras do Mackenzie</h2><button type="button" class="x" data-do="close" aria-label="Fechar">×</button></header>'
+      + '<div class="sheet__main">'
+      + '<div class="fixed"><p>3 etapas <span>com peso 2, 2 e 3 na média final</span></p><p>At1 e At2 <span>com peso 4, e a</span> APA <span>com peso 2, na maioria das matérias</span></p><p>(At2 + APA) ÷ 2 <span>ou</span> (At1 + APA) ÷ 2 <span>nas matérias que só têm duas atividades. Dá pra trocar dentro de cada matéria.</span></p><p>Recuperação de etapa <span>(1ª e 2ª): (média da etapa + prova) ÷ 2</span></p><p>Recuperação final <span>precisa de 6 + o que faltou pra média 6</span></p></div>'
+      + '<div class="field"><label class="lbl" for="r-pass">Média pra passar</label><input class="num" id="r-pass" inputmode="decimal" autocomplete="off" value="' + esc(d.pass) + '"><p class="hint">Se a média mínima da sua série for outra, é só trocar aqui.</p></div>'
+      + '<p class="form-err" id="r-err" role="alert" hidden></p>'
+      + '</div>'
+      + '<footer class="sheet__foot"><button type="button" class="btn btn--ghost" data-do="close">Cancelar</button><button type="button" class="btn btn--primary" data-do="saveRules">Salvar</button></footer>';
+    if (focusId) { const el = document.getElementById(focusId); if (el) el.focus(); }
+  }
+  function readDraft() {
+    const p = $('#r-pass'); if (p) draft.pass = p.value;
+  }
+  function openRules() {
+    draft = { pass: raw(S.rules.pass) };
+    renderRules();
+    $('#rulesDlg').showModal();
+  }
+  function saveRules() {
+    readDraft();
+    const pass = parseNum(draft.pass);
+    let err = '';
+    if (!(pass > 0 && pass <= 10)) err = 'A média pra passar tem que ficar entre 0 e 10.';
+    if (err) { const e = $('#r-err'); e.textContent = err; e.hidden = false; e.scrollIntoView({ block: 'nearest' }); return; }
+    S.rules = { pass: pass };
+    save();
+    renderMain();
+    $('#rulesDlg').close();
+    toast('Ajustes salvos ✓');
+  }
+
+  /* ---------- adicionar ---------- */
+  function openAdd() {
+    const have = S.subjects.map((s) => baseName(s.name));
+    const chips = (list) => list.filter((q) => have.indexOf(baseName(q[0])) < 0).map((q) => '<button type="button" class="qchip" data-quick="' + esc(q[0]) + '" data-qe="' + q[1] + '">' + q[1] + ' ' + esc(q[0]) + '</button>').join('');
+    const trilhas = chips(TRILHAS);
+    const core = chips(SUBJECTS);
+    $('#addDlg').innerHTML = '<header class="sheet__head"><h2 id="a-title">Adicionar matéria</h2><button type="button" class="x" data-do="close" aria-label="Fechar">×</button></header>'
+      + '<div class="sheet__main">'
+      + (trilhas ? '<div class="block"><h3 class="block__t">Trilhas<small>a média da etapa já vem como (At2 + APA) ÷ 2</small></h3><div class="quick">' + trilhas + '</div></div>' : '')
+      + (core ? '<div class="block"><h3 class="block__t">Matérias que você removeu</h3><div class="quick">' + core + '</div></div>' : '')
+      + '<div class="block"><h3 class="block__t">Outra matéria</h3>'
+      + '<form class="add-form" id="addForm"><label class="sr" for="add-name">Nome da matéria</label><input id="add-name" placeholder="Ex.: Robótica" maxlength="40" autocomplete="off"><button class="btn btn--primary" type="submit">Adicionar</button></form>'
+      + '<p class="hint">Dá pra escolher a conta da média da etapa dentro da matéria depois.</p></div>'
+      + '</div><div class="sheet__foot"></div>';
+    $('#addDlg').showModal();
+  }
+  function addSubject(name, emoji) {
+    name = canonName(name);
+    const known = QUICK.find((q) => baseName(q[0]) === baseName(name));
+    if (known && (!emoji || emoji === '📘')) emoji = known[1];
+    if (!name) { const i = $('#add-name'); if (i) i.focus(); return; }
+    const used = S.subjects.map((s) => s.color);
+    let color = [0, 1, 2, 3, 4, 5, 6, 7].find((c) => used.indexOf(c) < 0);
+    if (color == null) color = S.subjects.length % 8;
+    const sub = newSubject(name, emoji || '📘', color);
+    S.subjects.push(sub);
+    save();
+    renderMain();
+    $('#addDlg').close();
+    openDetail(sub.id);
+    setTimeout(function () { const el = $('#a-0-' + schemeOf(sub).acts[0].k); if (el) el.focus(); }, 30);
+  }
+
+  /* ---------- extras ---------- */
+  let toastT = null;
+  function toast(msg) {
+    const t = $('#toast');
+    t.textContent = msg;
+    t.classList.add('is-on');
+    clearTimeout(toastT);
+    toastT = setTimeout(() => t.classList.remove('is-on'), 2600);
+  }
+
+  function boletimText() {
+    const lines = ['📒 Meu boletim (Quanto falta? · Mackenzie)', 'Média ' + fmt(S.rules.pass) + ' pra passar · etapas com peso 2, 2 e 3', ''];
+    S.subjects.forEach(function (sub) {
+      const a = analyze(sub);
+      const ets = a.ets.map((e) => ord(e.i) + ' ' + etapaVal(e) + (e.recV != null ? ' (rec)' : '')).join(' | ');
+      lines.push(sub.emoji + ' ' + (sub.name.trim() || 'Sem nome') + ' (' + ets + '): ' + shortLine(a) + ' ' + statusOf(a).face);
+    });
+    return lines.join('\n');
+  }
+  function copyBoletim() {
+    const txt = boletimText();
+    const fallback = function () {
+      $('#copyText').value = txt;
+      $('#copyBox').hidden = false;
+      $('#copyText').focus();
+      $('#copyText').select();
+    };
+    try {
+      if (!navigator.clipboard || !navigator.clipboard.writeText) { fallback(); return; }
+      navigator.clipboard.writeText(txt).then(function () {
+        $('#copyBox').hidden = true;
+        toast('Boletim copiado! É só colar no WhatsApp 📲');
+      }, fallback);
+    } catch (e) { fallback(); }
+  }
+
+  function confetti() {
+    if (reduceMotion()) return;
+    const host = $('#subjectDlg').open ? $('#subjectDlg') : document.body;
+    const cv = document.createElement('canvas');
+    cv.className = 'confetti';
+    host.appendChild(cv);
+    const dpr = Math.min(2, window.devicePixelRatio || 1);
+    const W = window.innerWidth, H = window.innerHeight;
+    cv.width = W * dpr; cv.height = H * dpr;
+    const ctx = cv.getContext('2d');
+    ctx.scale(dpr, dpr);
+    const cs = getComputedStyle(document.documentElement);
+    const colors = [0, 1, 2, 3, 4, 5, 6, 7].map((i) => cs.getPropertyValue('--s' + i).trim() || '#FFC93C');
+    const parts = Array.from({ length: 110 }, () => ({
+      x: W / 2 + (Math.random() - 0.5) * W * 0.3, y: H * 0.35,
+      vx: (Math.random() - 0.5) * 13, vy: -Math.random() * 13 - 4,
+      r: Math.random() * Math.PI, vr: (Math.random() - 0.5) * 0.35,
+      w: 6 + Math.random() * 6, h: 4 + Math.random() * 6,
+      c: colors[(Math.random() * colors.length) | 0]
+    }));
+    const t0 = performance.now();
+    (function tick(now) {
+      const t = now - t0;
+      ctx.clearRect(0, 0, W, H);
+      parts.forEach(function (p) {
+        p.vy += 0.38; p.vx *= 0.99; p.x += p.vx; p.y += p.vy; p.r += p.vr;
+        ctx.save(); ctx.translate(p.x, p.y); ctx.rotate(p.r);
+        ctx.globalAlpha = Math.max(0, 1 - t / 1900);
+        ctx.fillStyle = p.c; ctx.fillRect(-p.w / 2, -p.h / 2, p.w, p.h);
+        ctx.restore();
+      });
+      if (t < 1900) requestAnimationFrame(tick); else cv.remove();
+    })(t0);
+  }
+
+  /* ---------- eventos ---------- */
+  document.addEventListener('click', function (ev) {
+    const t = ev.target.closest('[data-do],[data-open],[data-quick],[data-pick],[data-color]');
+    if (!t) return;
+    if (t.dataset.open) { openDetail(t.dataset.open); return; }
+    if (t.dataset.quick) { addSubject(t.dataset.quick, t.dataset.qe); return; }
+    const sub = getSub(openId);
+    if (t.dataset.pick && sub) {
+      sub.emoji = t.dataset.pick; save(); renderMain();
+      $('.emoji-btn', $('#subjectDlg')).textContent = sub.emoji;
+      $$('#d-emojis [data-pick]').forEach((b) => b.setAttribute('aria-pressed', String(b.dataset.pick === sub.emoji)));
+      return;
+    }
+    if (t.dataset.color && sub) {
+      sub.color = +t.dataset.color; save(); renderMain();
+      $('.sheet__head', $('#subjectDlg')).style.setProperty('--c', 'var(--s' + sub.color + ')');
+      $$('#d-emojis [data-color]').forEach((b) => b.setAttribute('aria-pressed', String(+b.dataset.color === sub.color)));
+      return;
+    }
+    const i = +t.dataset.i;
+    switch (t.dataset.do) {
+      case 'rules': openRules(); break;
+      case 'goRec': {
+        if (!sub) break;
+        const id = sub.id;
+        $('#subjectDlg').close();
+        showTab('recuperacao');
+        const row = document.getElementById('rr-' + id + '-' + i);
+        if (row) {
+          row.scrollIntoView({ block: 'center', behavior: reduceMotion() ? 'auto' : 'smooth' });
+          row.classList.add('is-hl');
+          setTimeout(() => row.classList.remove('is-hl'), 1600);
+          const inp = $('input', row);
+          if (inp) setTimeout(() => inp.focus({ preventScroll: true }), 80);
+        }
+        break;
+      }
+      case 'add': openAdd(); break;
+      case 'close': { const d = t.closest('dialog'); if (d) d.close(); break; }
+      case 'copy': copyBoletim(); break;
+      case 'askReset': $('#resetConfirm').hidden = false; break;
+      case 'cancelReset': $('#resetConfirm').hidden = true; break;
+      case 'reset':
+        S.subjects.forEach((s) => { s.etapas = [0, 1, 2].map(blankEtapa); s.recFinal = ''; });
+        save(); renderMain();
+        $('#resetConfirm').hidden = true;
+        toast('Notas apagadas');
+        break;
+      case 'emoji': {
+        const p = $('#d-emojis');
+        p.hidden = !p.hidden;
+        t.setAttribute('aria-expanded', String(!p.hidden));
+        break;
+      }
+      case 'useActs':
+        if (!sub) break;
+        sub.etapas[i].direct = false;
+        userEdited = true; save(); rerenderEtapas('#a-' + i + '-' + schemeOf(sub).acts[0].k); renderMain();
+        break;
+      case 'useDirect':
+        if (!sub) break;
+        sub.etapas[i].direct = true;
+        userEdited = true; save(); rerenderEtapas('#ev-' + i); renderMain();
+        break;
+      case 'askDel': $('#d-delc').hidden = false; t.hidden = true; break;
+      case 'cancelDel': $('#d-delc').hidden = true; $('[data-do="askDel"]').hidden = false; break;
+      case 'del': {
+        if (!sub) break;
+        const name = sub.name.trim() || 'Matéria';
+        S.subjects = S.subjects.filter((x) => x.id !== sub.id);
+        save(); $('#subjectDlg').close(); renderMain();
+        toast(name + ' removida');
+        break;
+      }
+      case 'saveRules': saveRules(); break;
+    }
+  });
+
+  $('#subjectDlg').addEventListener('input', function (ev) {
+    const t = ev.target;
+    const sub = getSub(openId);
+    if (!sub) return;
+    if (t.id === 'd-slider') { updateSim(analyze(sub)); return; }
+    const k = t.dataset.k;
+    if (!k) return;
+    if (k === 'name') sub.name = t.value;
+    else if (['v', 'at1', 'at2', 'apa'].indexOf(k) >= 0) sub.etapas[+t.dataset.i][k] = t.value;
+    else return;
+    userEdited = k !== 'name';
+    save();
+    refreshDetail();
+    renderMain();
+  });
+  $('#subjectDlg').addEventListener('change', function (ev) {
+    if (ev.target.name === 'd-scheme') {
+      const sub = getSub(openId);
+      if (!sub) return;
+      sub.scheme = ev.target.value;
+      userEdited = true; save(); rerenderEtapas('#' + ev.target.id); renderMain();
+      return;
+    }
+    if (ev.target.id === 'd-name') {
+      const sub = getSub(openId);
+      if (sub && !sub.name.trim()) { sub.name = 'Matéria'; ev.target.value = sub.name; save(); renderMain(); }
+      else if (sub && isTrilha(sub.name) && sub.name !== canonName(sub.name)) { sub.name = canonName(sub.name); ev.target.value = sub.name; save(); renderMain(); }
+    }
+  });
+  $('#subjectDlg').addEventListener('close', function () { openId = null; });
+
+  $('#rulesDlg').addEventListener('input', function () { const e = $('#r-err'); if (e) e.hidden = true; });
+
+  document.addEventListener('submit', function (ev) {
+    if (ev.target.id === 'addForm') { ev.preventDefault(); addSubject($('#add-name').value, '📘'); }
+  });
+
+  ['#subjectDlg', '#rulesDlg', '#addDlg'].forEach(function (id) {
+    const d = $(id);
+    d.addEventListener('click', function (ev) { if (ev.target === d) d.close(); });
+  });
+
+  /* ---------- aba de recuperação ---------- */
+  function recRows() {
+    const rows = [];
+    S.subjects.forEach(function (sub) {
+      const a = analyze(sub);
+      [0, 1].forEach(function (i) {
+        const e = a.ets[i];
+        const hasRec = String(sub.etapas[i].rec || '').trim() !== '';
+        if ((e.known && e.pre < S.rules.pass - EPS) || hasRec) rows.push({ sub: sub, i: i, e: e });
+      });
+    });
+    return rows;
+  }
+
+  function renderRec() {
+    const T = S.rules.pass;
+    const exM = Math.max(0, Math.round((T - 2) * 10) / 10);
+    $('#recBoard').innerHTML = '<p class="board__t">a conta da recuperação</p>'
+      + '<p class="board__f">pós rec = (média da etapa + prova) ÷ 2</p>'
+      + '<p class="board__ex">Pra ficar com ' + fmt(T) + ', a prova precisa de <b>' + fmt(2 * T) + ' − média da etapa</b>.</p>'
+      + '<p class="board__ex">Exemplo: média ' + fmt(exM) + ' na etapa → precisa de <b>' + fmt(2 * T - exM) + '</b> na prova, porque (' + fmt(exM) + ' + ' + fmt(2 * T - exM) + ') ÷ 2 = ' + fmt(T) + '.</p>';
+    const rows = recRows();
+    let html;
+    if (!rows.length) {
+      const anyKnown = S.subjects.some((sub) => { const a = analyze(sub); return a.ets[0].known || a.ets[1].known; });
+      html = '<p class="rec-empty">' + (anyKnown
+        ? 'Nenhuma 1ª ou 2ª etapa abaixo de ' + fmt(T) + '. Sem recuperação por aqui! 🎉'
+        : 'Ainda não tem média fechada da 1ª ou da 2ª etapa. Coloque suas notas no Boletim e volta aqui: as etapas abaixo de ' + fmt(T) + ' aparecem sozinhas.') + '</p>';
+    } else {
+      const pend = rows.filter((r) => r.e.recV == null).length;
+      html = '<h3 class="rec-head">Etapas abaixo de ' + fmt(T) + '<small>' + rows.length + (rows.length === 1 ? ' etapa' : ' etapas') + (pend ? ' · ' + pend + ' sem nota da prova' : '') + '</small></h3>'
+        + '<div class="rec-list">' + rows.map(recRowHtml).join('') + '</div>';
+    }
+    $('#recList').innerHTML = html;
+    rows.forEach((r) => updateRecRow(r.sub, r.i));
+    updateQuick();
+    renderFinal();
+  }
+
+  /* recuperação final */
+  function finalRows() {
+    return S.subjects.map((sub) => ({ sub: sub, a: analyze(sub) })).filter((r) => r.a.rec);
+  }
+
+  function renderFinal() {
+    const T = S.rules.pass;
+    const exK = Math.round((T - 0.8) * 10) / 10;
+    $('#recFinalBoard').innerHTML = '<p class="board__t">a conta da recuperação final</p>'
+      + '<p class="board__f">prova = ' + fmt(T) + ' + o que faltou pra ' + fmt(T) + '</p>'
+      + '<p class="board__ex">Exemplo: média final ' + fmt(exK) + ' → faltou ' + fmt(T - exK) + ' → precisa de ' + fmt(T) + ' + ' + fmt(T - exK) + ' = <b>' + fmt(2 * T - exK) + '</b> na prova.</p>';
+    const rows = finalRows();
+    const coming = S.subjects.filter((sub) => { const a = analyze(sub); return a.st === 'rec' && a.Rem > EPS; });
+    let html = '';
+    if (rows.length) {
+      const pend = rows.filter((r) => r.a.rec.got == null).length;
+      html += '<h3 class="rec-head">Matérias na recuperação final<small>' + rows.length + (rows.length === 1 ? ' matéria' : ' matérias') + (pend ? ' · ' + pend + ' sem nota da prova' : '') + '</small></h3>'
+        + '<div class="rec-list">' + rows.map((r) => finalRowHtml(r.sub)).join('') + '</div>';
+    } else if (!coming.length) {
+      html += '<p class="rec-empty">Nenhuma matéria fechou o ano abaixo de ' + fmt(T) + '. As que precisarem de recuperação final aparecem aqui quando a 3ª etapa tiver nota.</p>';
+    }
+    if (coming.length) {
+      html += '<p class="rec-also">Também vão pra recuperação final, mesmo tirando 10 no que falta: <b>' + coming.map((sub) => esc(sub.name.trim() || 'Sem nome')).join('</b>, <b>') + '</b>. A conta da prova aparece aqui quando a 3ª etapa fechar.</p>';
+    }
+    $('#recFinalList').innerHTML = html;
+    rows.forEach((r) => updateFinalRow(r.sub));
+    updateQuickFinal();
+  }
+
+  function finalRowHtml(sub) {
+    const key = 'f-' + sub.id;
+    return '<article class="rrow" id="rr-' + key + '" style="--c: var(--s' + sub.color + ')">'
+      + '<header class="rrow__head"><span class="card__emoji" aria-hidden="true">' + esc(sub.emoji) + '</span>'
+      + '<div><p class="rrow__name">' + (esc(sub.name.trim()) || 'Sem nome') + '</p><p class="rrow__sub" id="rs-' + key + '"></p></div></header>'
+      + '<p class="rrow__need" id="rn-' + key + '"></p>'
+      + '<div class="rrow__in"><label for="rv-' + key + '">Nota da prova final</label>'
+      + '<input class="grade" id="rv-' + key + '" data-recf="' + sub.id + '" inputmode="decimal" autocomplete="off" placeholder="—" value="' + esc(sub.recFinal) + '" aria-label="Nota da prova de recuperação final de ' + esc(sub.name) + '">'
+      + '<span class="rrow__post" id="rp-' + key + '"></span></div>'
+      + '</article>';
+  }
+
+  function updateFinalRow(sub) {
+    const key = 'f-' + sub.id;
+    const el = document.getElementById('rr-' + key);
+    if (!el) return;
+    const T = S.rules.pass;
+    const a = analyze(sub);
+    if (!a.rec) { el.className = 'rrow t-ok'; document.getElementById('rp-' + key).innerHTML = ''; return; }
+    const r = a.rec;
+    document.getElementById('rs-' + key).textContent = 'média final ' + fmt(a.K) + ' · faltou ' + fmt(r.faltou);
+    document.getElementById('rn-' + key).innerHTML = r.possible
+      ? 'Na prova final, precisa de ' + fmt(T) + ' + ' + fmt(r.faltou) + ' = <b>' + fmt(r.show) + '</b>.'
+      : 'Precisaria de <b>' + fmt(r.show) + '</b> na prova, mais que 10. Vale conversar com o professor ou a coordenação.';
+    setInvalid(document.getElementById('rv-' + key), !!r.err);
+    const rp = document.getElementById('rp-' + key);
+    let tone;
+    if (r.err) { rp.innerHTML = '<span class="err-inline">' + esc(r.err) + '</span>'; tone = 'bad'; }
+    else if (r.got != null) {
+      const ok = a.st === 'aprovadoRec';
+      rp.innerHTML = ok ? '→ <b>passou!</b> ✅' : '→ faltou <b>' + fmt(r.need - r.got) + '</b> 😕';
+      tone = ok ? 'ok' : 'bad';
+    } else { rp.innerHTML = ''; tone = r.possible ? 'warn' : 'bad'; }
+    el.className = 'rrow t-' + tone;
+  }
+
+  function updateQuickFinal() {
+    const T = S.rules.pass;
+    const m = readGrade($('#qf-m').value);
+    const p = readGrade($('#qf-p').value);
+    setInvalid($('#qf-m'), !!m.err);
+    setInvalid($('#qf-p'), !!p.err);
+    let html;
+    if (m.err) html = '<span class="err-inline">' + m.err + '</span>';
+    else if (m.v == null) html = 'Coloque a média final pra ver quanto precisa na prova.';
+    else if (m.v >= T - EPS) html = 'Com ' + fmt(m.v) + ' você passou direto, sem recuperação 😎';
+    else {
+      const need = 2 * T - m.v;
+      const show = up2(need);
+      const faltou = show - T;
+      html = need > 10 + EPS
+        ? 'Faltou ' + fmt(faltou) + ': precisaria de <b>' + fmt(show) + '</b> na prova, mais que 10.'
+        : 'Faltou ' + fmt(faltou) + ' pra ' + fmt(T) + ', então precisa de ' + fmt(T) + ' + ' + fmt(faltou) + ' = <b>' + fmt(show) + '</b> na prova.';
+      if (p.err) html += ' <span class="err-inline">' + p.err + '</span>';
+      else if (p.v != null) html += '<br>Com ' + fmt(p.v) + ' na prova: ' + (p.v >= need - EPS ? '<b>passou!</b> ✅' : 'faltou <b>' + fmt(need - p.v) + '</b> 😕');
+    }
+    $('#qf-out').innerHTML = html;
+  }
+
+  function recRowHtml(r) {
+    const key = r.sub.id + '-' + r.i;
+    return '<article class="rrow" id="rr-' + key + '" style="--c: var(--s' + r.sub.color + ')">'
+      + '<header class="rrow__head"><span class="card__emoji" aria-hidden="true">' + esc(r.sub.emoji) + '</span>'
+      + '<div><p class="rrow__name">' + (esc(r.sub.name.trim()) || 'Sem nome') + '</p><p class="rrow__sub" id="rs-' + key + '"></p></div></header>'
+      + '<p class="rrow__need" id="rn-' + key + '"></p>'
+      + '<div class="rrow__in"><label for="rv-' + key + '">Nota da prova</label>'
+      + '<input class="grade" id="rv-' + key + '" data-rec="' + r.sub.id + '" data-i="' + r.i + '" inputmode="decimal" autocomplete="off" placeholder="—" value="' + esc(r.sub.etapas[r.i].rec) + '" aria-label="Nota da prova de recuperação de ' + esc(r.sub.name) + ', ' + ord(r.i) + ' etapa">'
+      + '<span class="rrow__post" id="rp-' + key + '"></span></div>'
+      + '<p class="rrow__impact" id="ri-' + key + '"></p>'
+      + '</article>';
+  }
+
+  function updateRecRow(sub, i) {
+    const key = sub.id + '-' + i;
+    const el = document.getElementById('rr-' + key);
+    if (!el) return;
+    const T = S.rules.pass;
+    const a = analyze(sub);
+    const e = a.ets[i];
+    const noRec = analyzeWith(sub, i, '');
+    const rs = document.getElementById('rs-' + key), rn = document.getElementById('rn-' + key);
+    const rp = document.getElementById('rp-' + key), ri = document.getElementById('ri-' + key);
+    setInvalid(document.getElementById('rv-' + key), !!e.errs.rec);
+    if (!e.known) {
+      rs.textContent = ord(i) + ' etapa · notas incompletas';
+      rn.textContent = 'Termine as notas dessa etapa no Boletim pra calcular.';
+      rp.innerHTML = ''; ri.innerHTML = '';
+      el.className = 'rrow t-none';
+      return;
+    }
+    const pre = e.pre;
+    const need = 2 * T - pre;
+    rs.textContent = ord(i) + ' etapa · média ' + fmt(pre);
+    rn.innerHTML = need > 10 + EPS
+      ? 'Nem com 10 na prova a etapa chega a ' + fmt(T) + ': no máximo fica com <b>' + fmt((pre + 10) / 2) + '</b>.'
+      : 'Pra ficar com ' + fmt(T) + ' na etapa, precisa de <b>' + fmt(up1(need), 1) + '</b> na prova.';
+    let tone;
+    if (e.errs.rec) {
+      rp.innerHTML = '<span class="err-inline">' + esc(e.errs.rec) + '</span>';
+      ri.innerHTML = '';
+      tone = 'bad';
+    } else if (e.recV != null) {
+      const ok = e.value >= T - EPS;
+      tone = ok ? 'ok' : 'bad';
+      rp.innerHTML = '→ etapa fica com <b>' + fmt(e.value) + '</b> ' + (ok ? '✅' : '😕');
+      ri.innerHTML = 'Antes da recuperação: ' + shortLine(noRec) + '.<br>Com essa nota: <b>' + shortLine(a) + '</b>.';
+    } else {
+      tone = need > 10 + EPS ? 'bad' : 'warn';
+      rp.innerHTML = '';
+      const target = Math.min(10, up1(need));
+      const withNeed = analyzeWith(sub, i, raw(target));
+      ri.innerHTML = 'Hoje, na matéria: ' + shortLine(noRec) + '.' + (need <= 10 + EPS ? '<br>Com ' + fmt(target, 1) + ' na prova: <b>' + shortLine(withNeed) + '</b>.' : '');
+    }
+    el.className = 'rrow t-' + tone;
+  }
+
+  function updateQuick() {
+    const T = S.rules.pass;
+    const m = readGrade($('#q-m').value);
+    const p = readGrade($('#q-p').value);
+    setInvalid($('#q-m'), !!m.err);
+    setInvalid($('#q-p'), !!p.err);
+    let html;
+    if (m.err) html = '<span class="err-inline">' + m.err + '</span>';
+    else if (m.v == null) html = 'Coloque a média da etapa pra ver quanto precisa na prova.';
+    else {
+      const need = 2 * T - m.v;
+      if (m.v >= T - EPS) html = 'Com ' + fmt(m.v) + ' você já tá na média da etapa: nem precisa de recuperação 😎';
+      else if (need > 10 + EPS) html = 'Nem com 10 na prova chega a ' + fmt(T) + ': no máximo fica com <b>' + fmt((m.v + 10) / 2) + '</b>.';
+      else html = 'Pra ficar com ' + fmt(T) + ', precisa de <b>' + fmt(up1(need), 1) + '</b> na prova.';
+      if (p.err) html += ' <span class="err-inline">' + p.err + '</span>';
+      else if (p.v != null) {
+        const post = (m.v + p.v) / 2;
+        html += '<br>Com ' + fmt(p.v) + ' na prova: (' + fmt(m.v) + ' + ' + fmt(p.v) + ') ÷ 2 = <b>' + fmt(post) + '</b> ' + (post >= T - EPS ? '✅' : '😕');
+      }
+    }
+    $('#q-out').innerHTML = html;
+  }
+
+  function showTab(name) {
+    const rec = name === 'recuperacao';
+    $('#panel-boletim').hidden = rec;
+    $('#panel-rec').hidden = !rec;
+    $('#tab-boletim').setAttribute('aria-selected', String(!rec));
+    $('#tab-rec').setAttribute('aria-selected', String(rec));
+    $('#tab-boletim').tabIndex = rec ? -1 : 0;
+    $('#tab-rec').tabIndex = rec ? 0 : -1;
+    if (rec) renderRec();
+    const h = rec ? 'recuperacao' : 'boletim';
+    if (location.hash.slice(1) !== h) { try { location.hash = h; } catch (e) { /* ignora */ } }
+  }
+
+  $('.tabs').addEventListener('click', function (ev) {
+    const t = ev.target.closest('[data-tab]');
+    if (t) showTab(t.dataset.tab);
+  });
+  $('.tabs').addEventListener('keydown', function (ev) {
+    if (ev.key !== 'ArrowLeft' && ev.key !== 'ArrowRight') return;
+    const next = $('#tab-boletim').getAttribute('aria-selected') === 'true' ? 'recuperacao' : 'boletim';
+    showTab(next);
+    (next === 'recuperacao' ? $('#tab-rec') : $('#tab-boletim')).focus();
+    ev.preventDefault();
+  });
+  window.addEventListener('hashchange', function () {
+    const h = location.hash.slice(1);
+    if (h === 'recuperacao' || h === 'boletim') showTab(h);
+  });
+  $('#panel-rec').addEventListener('input', function (ev) {
+    const t = ev.target;
+    if (t.id === 'q-m' || t.id === 'q-p') { updateQuick(); return; }
+    if (t.id === 'qf-m' || t.id === 'qf-p') { updateQuickFinal(); return; }
+    if (t.dataset.recf) {
+      const sf = getSub(t.dataset.recf);
+      if (!sf) return;
+      sf.recFinal = t.value;
+      userEdited = true;
+      save();
+      updateFinalRow(sf);
+      recRows().forEach((r) => updateRecRow(r.sub, r.i));
+      renderMain();
+      return;
+    }
+    if (!t.dataset.rec) return;
+    const sub = getSub(t.dataset.rec);
+    if (!sub) return;
+    sub.etapas[+t.dataset.i].rec = t.value;
+    userEdited = true;
+    save();
+    updateRecRow(sub, +t.dataset.i);
+    renderMain();
+    renderFinal();
+  });
+
+  renderMain();
+  if (location.hash === '#recuperacao') showTab('recuperacao');
+})();
+</script>
+</body>
+</html>
