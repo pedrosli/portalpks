@@ -251,9 +251,36 @@ p { margin: 0; }
 /* ---------- Fichas ---------- */
 .grid {
   display: grid;
-  grid-template-columns: repeat(auto-fill, minmax(min(100%, 290px), 1fr));
-  gap: 30px 22px;
-  padding-top: 8px;
+  grid-template-columns: repeat(auto-fill, minmax(min(100%, 230px), 1fr));
+  gap: 10px;
+}
+.tile {
+  display: grid; grid-template-columns: auto minmax(0, 1fr) auto; align-items: center; gap: 10px;
+  min-height: 56px;
+  padding: 8px 14px 8px 8px;
+  text-align: left;
+  background: var(--card);
+  color: var(--ink);
+  border: 2px solid var(--edge);
+  border-radius: 14px;
+  box-shadow: 3px 3px 0 var(--hard);
+  transition: transform .12s ease, box-shadow .12s ease;
+}
+.tile:hover { transform: translate(-1px, -1px); box-shadow: 4px 4px 0 var(--hard); }
+.tile:active { transform: translate(2px, 2px); box-shadow: 1px 1px 0 var(--hard); }
+.tile .card__emoji { width: 38px; height: 38px; font-size: 1.15rem; }
+.tile .card__name { font: 700 1.08rem/1.15 var(--f-display); }
+.tile__warn { font-size: .85rem; }
+.tile__avg { display: grid; justify-items: end; line-height: 1; }
+.tile__avg b { font: 800 1.4rem/1 var(--f-display); color: var(--st); font-variant-numeric: tabular-nums; }
+.tile__avg small { margin-top: 3px; font-size: .64rem; font-weight: 800; letter-spacing: .07em; text-transform: uppercase; color: var(--ink-faint); }
+.tile--add { grid-template-columns: auto minmax(0, 1fr); border: 2px dashed var(--ink-faint); background: transparent; box-shadow: none; color: var(--ink-soft); font-weight: 800; }
+.tile--add .plus { width: 38px; height: 38px; display: grid; place-items: center; font: 800 1.6rem/1 var(--f-display); }
+.tile--add:hover { border-color: var(--pen); color: var(--pen); box-shadow: none; transform: none; }
+@media (max-width: 520px) {
+  .grid { gap: 8px; }
+  .tile { min-height: 50px; }
+  .tile .card__emoji, .tile--add .plus { width: 34px; height: 34px; }
 }
 .card {
   position: relative;
@@ -410,6 +437,9 @@ dialog.sheet {
 }
 dialog.sheet--sm { width: min(560px, calc(100% - 32px)); }
 dialog.sheet::backdrop { background: var(--backdrop); }
+dialog.sheet[open] { animation: sheet-grow .24s cubic-bezier(.2, .9, .3, 1.15) both; }
+@keyframes sheet-grow { from { opacity: 0; transform: scale(.9); } to { opacity: 1; transform: none; } }
+@keyframes sheet-up { from { opacity: 0; transform: translateY(48px); } to { opacity: 1; transform: none; } }
 @media (max-width: 640px) {
   dialog.sheet, dialog.sheet--sm {
     width: 100%;
@@ -419,6 +449,7 @@ dialog.sheet::backdrop { background: var(--backdrop); }
     border-radius: 22px 22px 0 0;
     box-shadow: none;
   }
+  dialog.sheet[open] { animation-name: sheet-up; }
 }
 .sheet__head {
   position: sticky; top: 0; z-index: 3;
@@ -1077,20 +1108,6 @@ dialog.sheet::backdrop { background: var(--backdrop); }
   }
 
   /* ---------- textos ---------- */
-  function bigHtml(a) {
-    const T = fmt(S.rules.pass);
-    let pre = '', val = '', post = '', word = false;
-    if (a.st === 'vazio') { pre = 'precisa de'; val = fmt(up1(a.ff * 10), 1); post = 'em cada etapa'; }
-    else if (PENDING.indexOf(a.st) >= 0) { pre = 'precisa de'; val = fmt(up1(a.ff * 10), 1); post = pendingWhere(a); }
-    else if (a.st === 'garantido') { pre = 'pela média'; val = 'já passou'; word = true; post = 'média até agora ' + fmt(a.avg); }
-    else if (a.st === 'aprovado') { pre = 'média final'; val = fmt(a.K); }
-    else if (a.st === 'aprovadoRec') { pre = 'recuperação final'; val = 'passou'; word = true; post = 'tirou ' + fmt(a.rec.got) + ', precisava de ' + fmt(a.rec.show); }
-    else if (a.Rem > EPS) { pre = 'mesmo com 10 em tudo, chega em'; val = fmt(a.K + a.Rem); post = 'precisa de ' + T; }
-    else if (a.rec.possible) { pre = a.rec.got != null ? 'na recuperação final precisava de' : 'na recuperação final precisa de'; val = fmt(a.rec.show); post = 'média do ano ' + fmt(a.K); }
-    else { pre = 'média final'; val = fmt(a.K); post = 'nem com 10 na recuperação final dá'; }
-    return '<span class="big"><span class="big__pre">' + pre + '</span><span class="big__row"><strong class="' + (word ? 'is-word' : '') + '">' + val + '</strong>' + (post ? '<span class="big__post">' + post + '</span>' : '') + '</span></span>';
-  }
-
   function verdictText(a) {
     const R = S.rules;
     const T = fmt(R.pass);
@@ -1148,15 +1165,17 @@ dialog.sheet::backdrop { background: var(--backdrop); }
   /* ---------- tela principal ---------- */
   function cardHtml(sub, a) {
     const s = statusOf(a);
-    const chips = a.ets.map((e) => '<span class="chip' + (e.known ? '' : e.anyKnown ? ' chip--partial' : ' chip--empty') + '"><i>' + ord(e.i) + '</i>' + etapaVal(e) + (e.recV != null ? '<small>rec</small>' : '') + '</span>').join('');
-    return '<button type="button" class="card t-' + s.tone + '" data-open="' + sub.id + '" style="--c: var(--s' + sub.color + ')">'
-      + '<span class="card__tape" aria-hidden="true"></span>'
-      + '<span class="card__top"><span class="card__emoji" aria-hidden="true">' + esc(sub.emoji) + '</span><span class="card__name">' + (esc(sub.name.trim()) || 'Sem nome') + '</span></span>'
-      + '<span class="pill"><span aria-hidden="true">' + s.face + '</span>' + s.t + '</span>'
-      + bigHtml(a)
-      + thermoHtml(a, false)
-      + '<span class="card__chips">' + chips + '</span>'
-      + (a.errors ? '<span class="card__warn">⚠️ tem nota pra conferir</span>' : '')
+    const name = esc(sub.name.trim()) || 'Sem nome';
+    const done = a.Kmax > EPS && a.Rem < EPS;
+    const val = done ? a.K : a.avg;
+    const T = S.rules.pass;
+    const avgTone = val == null ? 'none' : (a.st === 'aprovadoRec' || val >= T - EPS) ? 'ok' : val >= T - 1 - EPS ? 'warn' : 'bad';
+    const avg = val == null ? '' : '<span class="tile__avg t-' + avgTone + '"><b>' + fmt(val) + '</b><small>' + (done ? 'final' : 'média') + '</small></span>';
+    const label = name + (val == null ? ', sem notas' : (done ? ', média final ' : ', média ') + fmt(val)) + '. ' + s.t + (a.errors ? '. Tem nota pra conferir' : '');
+    return '<button type="button" class="tile t-' + s.tone + '" data-open="' + sub.id + '" style="--c: var(--s' + sub.color + ')" aria-label="' + label + '">'
+      + '<span class="card__emoji" aria-hidden="true">' + esc(sub.emoji) + '</span>'
+      + '<span class="card__name">' + name + (a.errors ? ' <span class="tile__warn" aria-hidden="true">⚠️</span>' : '') + '</span>'
+      + avg
       + '</button>';
   }
 
@@ -1211,7 +1230,7 @@ dialog.sheet::backdrop { background: var(--backdrop); }
     const list = S.subjects.map((sub) => ({ sub: sub, a: analyze(sub) }));
     renderSummary(list);
     $('#grid').innerHTML = list.map((x) => cardHtml(x.sub, x.a)).join('')
-      + '<button type="button" class="card card--add" data-do="add"><span class="plus" aria-hidden="true">+</span><span>Adicionar matéria</span></button>';
+      + '<button type="button" class="tile tile--add" data-do="add"><span class="plus" aria-hidden="true">+</span><span>Adicionar matéria</span></button>';
     renderHow();
     const pend = recRows().filter((r) => r.e.recV == null && r.e.known).length + finalRows().filter((r) => r.a.rec.got == null).length;
     const rc = $('#recCount');
