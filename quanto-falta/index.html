@@ -752,6 +752,39 @@ dialog.sheet[open] { animation: sheet-grow .24s cubic-bezier(.2, .9, .3, 1.15) b
 .tag--btn { border: 0; background: var(--warn-bg); color: var(--warn); cursor: pointer; }
 .tag--btn:hover { text-decoration: underline; }
 
+/* ---------- Aba da IA ---------- */
+.ia-intro { display: grid; grid-template-columns: minmax(0, 1.1fr) minmax(0, 1fr); gap: 24px; align-items: start; }
+@media (max-width: 820px) { .ia-intro { grid-template-columns: minmax(0, 1fr); } }
+.ia-intro h2 { font: 800 1.7rem/1.1 var(--f-display); margin-bottom: 10px; }
+.ia-intro p { color: var(--ink-soft); max-width: 36rem; }
+.ia-box {
+  display: grid; gap: 16px;
+  padding: 18px;
+  border-radius: 18px;
+  background: var(--card);
+  border: 2px solid var(--edge);
+  box-shadow: 4px 4px 0 var(--hard);
+}
+.ia-opts { display: grid; grid-template-columns: repeat(auto-fit, minmax(min(100%, 200px), 1fr)); gap: 10px; }
+.ia-prompt { display: grid; gap: 8px; }
+.ia-prompt textarea {
+  width: 100%; min-height: 17rem;
+  padding: 14px;
+  border-radius: 12px;
+  border: 2px solid var(--line);
+  background: var(--paper);
+  color: var(--ink);
+  font: 500 .9rem/1.5 ui-monospace, SFMono-Regular, Menlo, Consolas, monospace;
+  resize: vertical;
+}
+.ia-actions { display: flex; flex-wrap: wrap; gap: 10px; }
+a.btn { text-decoration: none; }
+@media (max-width: 520px) {
+  .tabs { gap: 4px; padding-left: 0; }
+  .tab { padding: 8px 10px 6px; font-size: 1rem; gap: 5px; }
+  .tab[aria-selected="true"] { padding-top: 11px; }
+}
+
 @media (prefers-reduced-motion: reduce) {
   *, *::before, *::after { transition: none !important; animation: none !important; }
 }
@@ -776,6 +809,7 @@ dialog.sheet[open] { animation: sheet-grow .24s cubic-bezier(.2, .9, .3, 1.15) b
   <nav class="tabs" role="tablist" aria-label="Seções">
     <button class="tab" type="button" role="tab" id="tab-boletim" aria-controls="panel-boletim" aria-selected="true" data-tab="boletim">📒 Boletim</button>
     <button class="tab" type="button" role="tab" id="tab-rec" aria-controls="panel-rec" aria-selected="false" tabindex="-1" data-tab="recuperacao">🛟 Recuperação <span class="tabs__count" id="recCount" hidden></span></button>
+    <button class="tab" type="button" role="tab" id="tab-ia" aria-controls="panel-ia" aria-selected="false" tabindex="-1" data-tab="ia">🤖 Usar IA</button>
   </nav>
 
   <div class="panel" id="panel-boletim" role="tabpanel" aria-labelledby="tab-boletim">
@@ -845,6 +879,43 @@ dialog.sheet[open] { animation: sheet-grow .24s cubic-bezier(.2, .9, .3, 1.15) b
       <div class="board" id="recFinalBoard"></div>
     </section>
     <section class="block" id="recFinalList" aria-live="polite"></section>
+  </div>
+
+  <div class="panel" id="panel-ia" role="tabpanel" aria-labelledby="tab-ia" hidden>
+    <section class="ia-intro">
+      <div>
+        <h2>Fazer a conta com IA</h2>
+        <p>Prefere que uma IA leia o seu boletim? O site monta o pedido certinho, com todas as regras do Mackenzie. Você cola esse pedido no ChatGPT, no Gemini ou no Claude e manda junto o print das suas notas.</p>
+      </div>
+      <ol class="steps">
+        <li><b>Tira um print</b> das suas notas no app ou no portal da escola.</li>
+        <li><b>Escolhe o que você quer saber</b> aqui embaixo.</li>
+        <li><b>Copia o pedido</b> e cola na IA que você usa.</li>
+        <li><b>Anexa o print</b> na mesma conversa e manda.</li>
+      </ol>
+    </section>
+    <section class="ia-box" aria-label="Pedido pra IA">
+      <fieldset class="field"><legend>O que você quer saber?</legend>
+        <div class="ia-opts">
+          <label class="opt"><input type="checkbox" id="ia-medias" checked><b>Médias</b><span>de cada etapa e a média final</span></label>
+          <label class="opt"><input type="checkbox" id="ia-falta" checked><b>Quanto falta</b><span>pra passar em cada matéria</span></label>
+          <label class="opt"><input type="checkbox" id="ia-rec"><b>Recuperação</b><span>de etapa e final, se precisar</span></label>
+          <label class="opt"><input type="checkbox" id="ia-foco"><b>Onde focar</b><span>as matérias que pedem mais atenção</span></label>
+        </div>
+      </fieldset>
+      <div class="ia-prompt">
+        <label class="block__t" for="ia-text">Pedido pra IA</label>
+        <textarea id="ia-text" readonly></textarea>
+      </div>
+      <div class="ia-actions">
+        <button class="btn btn--primary" type="button" data-do="copyPrompt">Copiar pedido</button>
+        <a class="btn" id="ia-chatgpt" href="https://chatgpt.com/" target="_blank" rel="noopener">Abrir no ChatGPT</a>
+        <a class="btn" id="ia-claude" href="https://claude.ai/new" target="_blank" rel="noopener">Abrir no Claude</a>
+        <a class="btn" href="https://gemini.google.com/app" target="_blank" rel="noopener">Abrir o Gemini</a>
+      </div>
+      <p class="hint">No ChatGPT e no Claude o pedido já vai escrito, é só anexar o print. No Gemini, cola o pedido e anexa o print.</p>
+      <p class="hint">A IA pode ler algum número errado no print. Na dúvida, confere no Boletim daqui, que faz a conta certinha.</p>
+    </section>
   </div>
   </div>
 
@@ -1239,6 +1310,7 @@ dialog.sheet[open] { animation: sheet-grow .24s cubic-bezier(.2, .9, .3, 1.15) b
     rc.setAttribute('aria-label', pend + (pend === 1 ? ' recuperação sem nota da prova' : ' recuperações sem nota da prova'));
     const rp = $('#panel-rec');
     if (!rp.hidden && !rp.contains(document.activeElement)) renderRec();
+    if (!$('#panel-ia').hidden) updatePrompt();
     const next = {};
     let party = false;
     list.forEach(function (x) {
@@ -1598,6 +1670,7 @@ dialog.sheet[open] { animation: sheet-grow .24s cubic-bezier(.2, .9, .3, 1.15) b
       case 'add': openAdd(); break;
       case 'close': { const d = t.closest('dialog'); if (d) d.close(); break; }
       case 'copy': copyBoletim(); break;
+      case 'copyPrompt': copyPrompt(); break;
       case 'askReset': $('#resetConfirm').hidden = false; break;
       case 'cancelReset': $('#resetConfirm').hidden = true; break;
       case 'reset':
@@ -1885,17 +1958,86 @@ dialog.sheet[open] { animation: sheet-grow .24s cubic-bezier(.2, .9, .3, 1.15) b
     $('#q-out').innerHTML = html;
   }
 
+  /* ---------- aba da IA ---------- */
+  function buildPrompt() {
+    const T = fmt(S.rules.pass);
+    const uniq = (arr) => arr.filter((n, i) => arr.findIndex((m) => baseName(m) === baseName(n)) === i);
+    const at1 = uniq(S.subjects.filter((s) => s.scheme === 'at1apa').map((s) => s.name.trim()).concat(SUBJECTS.filter((x) => x[2] === 'at1apa').map((x) => x[0])));
+    const at2 = uniq(S.subjects.filter((s) => s.scheme === 'at2apa').map((s) => s.name.trim()).concat(TRILHAS.map((x) => x[0])));
+    const want = {
+      medias: $('#ia-medias').checked,
+      falta: $('#ia-falta').checked,
+      rec: $('#ia-rec').checked,
+      foco: $('#ia-foco').checked
+    };
+    if (!want.medias && !want.falta && !want.rec && !want.foco) want.medias = true;
+    const asks = [];
+    if (want.medias) asks.push('Uma tabela com cada matéria do print: a média de cada etapa que já tem nota e a média final (ou a média até agora, se o ano ainda não acabou).');
+    if (want.falta) asks.push('Pra cada matéria que ainda não acabou: quanto eu preciso tirar no que falta pra fechar o ano com média ' + T + ', supondo a mesma nota em tudo que falta. Se eu já garanti a média, me avisa.');
+    if (want.rec) asks.push('Se a 1ª ou a 2ª etapa de alguma matéria ficou abaixo de ' + T + ': quanto eu preciso na prova de recuperação dessa etapa pra ela ficar com ' + T + '. Se a média final de alguma matéria ficar abaixo de ' + T + ': quanto eu preciso na recuperação final.');
+    if (want.foco) asks.push('No final, em 2 ou 3 frases, me diz em quais matérias eu devo focar primeiro e por quê.');
+    return [
+      'Oi! Vou te mandar um print das minhas notas do Colégio Mackenzie. Quero que você faça as contas usando exatamente as regras abaixo.',
+      '',
+      'REGRAS',
+      '- O ano tem 3 etapas. Média final = (1ª etapa × 2 + 2ª etapa × 2 + 3ª etapa × 3) ÷ 7.',
+      '- Média de cada etapa, na maioria das matérias: (At1 × 4 + At2 × 4 + APA × 2) ÷ 10.',
+      at1.length ? '- Em ' + joinPt(at1) + ': (At1 + APA) ÷ 2.' : '',
+      at2.length ? '- Nas trilhas (' + joinPt(at2) + '): (At2 + APA) ÷ 2.' : '',
+      '- As notas vão de 0 a 10. Pra passar, a média final tem que ser pelo menos ' + T + '.',
+      '- Recuperação da 1ª e da 2ª etapa: média pós recuperação = (média da etapa + nota da prova) ÷ 2. Ela entra no lugar da média da etapa.',
+      '- Recuperação final: precisa tirar ' + T + ' + o que faltou pra média final chegar em ' + T + '. Exemplo: média final ' + fmt(S.rules.pass - 0.8) + ' → precisa de ' + fmt(S.rules.pass + 0.8) + '.',
+      '',
+      'O QUE EU QUERO',
+      asks.map((a, i) => (i + 1) + '. ' + a).join('\n'),
+      '',
+      'CUIDADOS',
+      '- Lê as notas do print com cuidado. Se alguma estiver ilegível ou faltando, me pergunta em vez de chutar.',
+      '- Nota que ainda não saiu fica fora da conta (não conta como zero).',
+      '- Mostra a conta de uma matéria como exemplo, pra eu conferir.',
+      '- Arredonda as médias com 2 casas e a nota que eu preciso tirar pra cima, com 1 casa.',
+      '- Responde em português, de um jeito simples e direto.'
+    ].filter((l, i, arr) => l !== '' || arr[i - 1] !== '').join('\n');
+  }
+
+  function updatePrompt() {
+    const box = $('#ia-text');
+    if (!box) return;
+    const text = buildPrompt();
+    box.value = text;
+    $('#ia-chatgpt').href = 'https://chatgpt.com/?q=' + encodeURIComponent(text);
+    $('#ia-claude').href = 'https://claude.ai/new?q=' + encodeURIComponent(text);
+  }
+
+  function copyPrompt() {
+    const text = buildPrompt();
+    const fallback = function () {
+      const box = $('#ia-text');
+      box.focus();
+      box.select();
+      toast('Seleciona o texto e copia ✂️');
+    };
+    try {
+      if (!navigator.clipboard || !navigator.clipboard.writeText) { fallback(); return; }
+      navigator.clipboard.writeText(text).then(function () { toast('Pedido copiado! Agora cola na IA junto com o print 📸'); }, fallback);
+    } catch (e) { fallback(); }
+  }
+
+  // abas: nome no endereço → [botão, painel]
+  const TABS = { boletim: ['tab-boletim', 'panel-boletim'], recuperacao: ['tab-rec', 'panel-rec'], ia: ['tab-ia', 'panel-ia'] };
+  const TAB_ORDER = ['boletim', 'recuperacao', 'ia'];
   function showTab(name) {
-    const rec = name === 'recuperacao';
-    $('#panel-boletim').hidden = rec;
-    $('#panel-rec').hidden = !rec;
-    $('#tab-boletim').setAttribute('aria-selected', String(!rec));
-    $('#tab-rec').setAttribute('aria-selected', String(rec));
-    $('#tab-boletim').tabIndex = rec ? -1 : 0;
-    $('#tab-rec').tabIndex = rec ? 0 : -1;
-    if (rec) renderRec();
-    const h = rec ? 'recuperacao' : 'boletim';
-    if (location.hash.slice(1) !== h) { try { location.hash = h; } catch (e) { /* ignora */ } }
+    if (!TABS[name]) name = 'boletim';
+    TAB_ORDER.forEach(function (k) {
+      const on = k === name;
+      const tab = document.getElementById(TABS[k][0]);
+      tab.setAttribute('aria-selected', String(on));
+      tab.tabIndex = on ? 0 : -1;
+      document.getElementById(TABS[k][1]).hidden = !on;
+    });
+    if (name === 'recuperacao') renderRec();
+    if (name === 'ia') updatePrompt();
+    if (location.hash.slice(1) !== name) { try { location.hash = name; } catch (e) { /* ignora */ } }
   }
 
   $('.tabs').addEventListener('click', function (ev) {
@@ -1904,14 +2046,15 @@ dialog.sheet[open] { animation: sheet-grow .24s cubic-bezier(.2, .9, .3, 1.15) b
   });
   $('.tabs').addEventListener('keydown', function (ev) {
     if (ev.key !== 'ArrowLeft' && ev.key !== 'ArrowRight') return;
-    const next = $('#tab-boletim').getAttribute('aria-selected') === 'true' ? 'recuperacao' : 'boletim';
+    const cur = TAB_ORDER.findIndex((k) => document.getElementById(TABS[k][0]).getAttribute('aria-selected') === 'true');
+    const next = TAB_ORDER[(cur + (ev.key === 'ArrowRight' ? 1 : -1) + TAB_ORDER.length) % TAB_ORDER.length];
     showTab(next);
-    (next === 'recuperacao' ? $('#tab-rec') : $('#tab-boletim')).focus();
+    document.getElementById(TABS[next][0]).focus();
     ev.preventDefault();
   });
   window.addEventListener('hashchange', function () {
     const h = location.hash.slice(1);
-    if (h === 'recuperacao' || h === 'boletim') showTab(h);
+    if (TABS[h]) showTab(h);
   });
   $('#panel-rec').addEventListener('input', function (ev) {
     const t = ev.target;
@@ -1940,7 +2083,9 @@ dialog.sheet[open] { animation: sheet-grow .24s cubic-bezier(.2, .9, .3, 1.15) b
   });
 
   renderMain();
-  if (location.hash === '#recuperacao') showTab('recuperacao');
+  $('#panel-ia').addEventListener('change', updatePrompt);
+  const startTab = location.hash.slice(1);
+  if (startTab === 'recuperacao' || startTab === 'ia') showTab(startTab);
 })();
 </script>
 </body>
