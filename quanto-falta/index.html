@@ -791,6 +791,43 @@ a.btn { text-decoration: none; }
   .tab[aria-selected="true"] { padding-top: 11px; }
 }
 
+/* ---------- Quanto preciso na 3ª (tela inicial) e destaque na etapa ---------- */
+.q3 {
+  display: grid; gap: 14px;
+  padding: 18px 20px;
+  border-radius: 18px;
+  background: var(--card);
+  border: 2px solid var(--edge);
+  box-shadow: 4px 4px 0 var(--hard);
+}
+.q3 h2 { font: 800 1.45rem/1.15 var(--f-display); }
+.q3 h2 mark {
+  color: var(--hl-ink);
+  background: linear-gradient(100deg, transparent 1%, var(--hl) 3%, var(--hl) 97%, transparent 99%);
+  padding: 0 .12em;
+  border-radius: .2em;
+  box-decoration-break: clone;
+}
+.q3__head p { color: var(--ink-soft); margin-top: 4px; }
+.q3__row { display: flex; flex-wrap: wrap; align-items: end; gap: 12px 18px; }
+.q3__row label { display: grid; gap: 6px; font-weight: 700; font-size: .9rem; color: var(--ink-soft); }
+.q3__out { flex: 1 1 16rem; min-width: 0; font-size: 1.05rem; font-weight: 600; }
+.q3__out b { font: 800 2.4rem/1 var(--f-display); color: var(--pen); vertical-align: -.15em; }
+.q3__out small { display: block; margin-top: 4px; font-size: .85rem; font-weight: 600; color: var(--ink-faint); }
+.need-box {
+  display: flex; align-items: center; gap: 12px;
+  padding: 12px 14px;
+  border-radius: 14px;
+  background: var(--hl);
+  color: var(--hl-ink);
+  font-weight: 700;
+}
+.need-box__ico { font-size: 1.6rem; line-height: 1; flex: none; }
+.need-box b { font: 800 1.9rem/1 var(--f-display); vertical-align: -.12em; }
+.need-box small { display: block; margin-top: 2px; font-size: .82rem; font-weight: 600; opacity: .8; }
+.need-box--ok { background: var(--ok-bg); color: var(--ok); }
+.need-box--bad { background: var(--bad-bg); color: var(--bad); }
+
 @media (prefers-reduced-motion: reduce) {
   *, *::before, *::after { transition: none !important; animation: none !important; }
 }
@@ -819,10 +856,23 @@ a.btn { text-decoration: none; }
   </nav>
 
   <div class="panel" id="panel-boletim" role="tabpanel" aria-labelledby="tab-boletim">
+  <section class="q3" aria-labelledby="q3-t">
+    <div class="q3__head">
+      <h2 id="q3-t">🎯 <mark>Quanto preciso</mark> na 3ª etapa?</h2>
+      <p>Já sabe suas médias? Coloca aqui e vê na hora. Pra fazer a conta pelas atividades, toca na matéria lá embaixo.</p>
+    </div>
+    <div class="q3__row">
+      <label for="q3-a">Média da 1ª<input class="grade" id="q3-a" inputmode="decimal" autocomplete="off" placeholder="—"></label>
+      <label for="q3-b">Média da 2ª<input class="grade" id="q3-b" inputmode="decimal" autocomplete="off" placeholder="—"></label>
+      <p class="q3__out" id="q3-out" aria-live="polite"></p>
+    </div>
+  </section>
+
   <aside class="postit" id="sampleNote" hidden>
     <p class="postit__hey">Bora começar?</p>
     <p>Toque numa matéria e coloque suas notas de At1, At2 e APA. O que ainda não aconteceu, deixe em branco: o site mostra quanto você precisa tirar.</p>
   </aside>
+
 
   <section class="summary" id="summary" aria-label="Resumo do ano"></section>
 
@@ -1333,6 +1383,7 @@ a.btn { text-decoration: none; }
     const rp = $('#panel-rec');
     if (!rp.hidden && !rp.contains(document.activeElement)) renderRec();
     if (!$('#panel-ia').hidden) updatePrompt();
+    updateQ3();
     const next = {};
     let party = false;
     list.forEach(function (x) {
@@ -1362,6 +1413,7 @@ a.btn { text-decoration: none; }
       + '<div class="etapa__field"><label class="etapa__lbl" for="eb-' + i + '">bônus</label><span class="grade__max" aria-hidden="true">+</span>'
       + '<input id="eb-' + i + '" class="grade grade--bonus" data-k="bonus" data-i="' + i + '" inputmode="decimal" autocomplete="off" placeholder="0" value="' + esc(et.bonus) + '" aria-label="Bônus da ' + ord(i) + ' etapa"></div>'
       + '<div class="etapa__out" id="eo-' + i + '"></div></div>'
+      + '<div class="need-box" id="nb-' + i + '" hidden></div>'
       + '<p class="etapa__note" id="en-' + i + '" hidden></p>'
       + acts + '</div>';
   }
@@ -1449,10 +1501,31 @@ a.btn { text-decoration: none; }
       const note = $('#en-' + e.i, dlg);
       note.hidden = !notes.length;
       note.innerHTML = notes.join(' ');
+      // destaque grande: quanto precisa nessa etapa
+      let nbHtml = '', nbTone = '';
       if (!e.known) {
-        if (a.ff != null) tag = '<span class="tag">precisa fechar com <b>' + fmt(up1(etapaTarget(a, e)), 1) + '</b></span>';
-        else if (a.st === 'rec' && a.Rem > EPS) tag = '<span class="tag">dá o máximo 💪</span>';
+        const T = fmt(S.rules.pass);
+        const pending = a.ets.filter((x) => !x.known).length;
+        if (a.st === 'garantido') {
+          nbTone = 'ok';
+          nbHtml = '<span class="need-box__ico" aria-hidden="true">✅</span><span>Pela média você já passou: qualquer nota na ' + ord(e.i) + ' etapa serve.</span>';
+        } else if (a.ff != null) {
+          const x = fmt(up1(etapaTarget(a, e)), 1);
+          const partial = e.anyKnown;
+          nbHtml = '<span class="need-box__ico" aria-hidden="true">🎯</span><span>'
+            + (partial ? 'Pra passar com média ' + T + ', você precisa fechar a ' + ord(e.i) + ' etapa com <b>' + x + '</b>' : 'Pra passar com média ' + T + ', você precisa de <b>' + x + '</b> de média na ' + ord(e.i) + ' etapa')
+            + (pending > 1 ? '<small>Supondo a mesma nota nas etapas que faltam.</small>' : '')
+            + (e.bonusRaw > 0 ? '<small>O bônus de +' + fmt(e.bonusRaw) + ' já tá contado.</small>' : '')
+            + '</span>';
+        } else if (a.st === 'rec' && a.Rem > EPS) {
+          nbTone = 'bad';
+          nbHtml = '<span class="need-box__ico" aria-hidden="true">😕</span><span>Mesmo com 10 na ' + ord(e.i) + ' etapa, a média não chega a ' + T + '.<small>Dá o máximo: cada ponto deixa a recuperação final mais fácil.</small></span>';
+        }
       }
+      const nb = $('#nb-' + e.i, dlg);
+      nb.hidden = !nbHtml;
+      nb.className = 'need-box' + (nbTone ? ' need-box--' + nbTone : '');
+      nb.innerHTML = nbHtml;
       schemeOf(sub).acts.forEach(function (ac) {
         const err = e.errs[ac.k];
         setInvalid($('#a-' + e.i + '-' + ac.k, dlg), !!err);
@@ -1973,6 +2046,35 @@ a.btn { text-decoration: none; }
     $('#q-out').innerHTML = html;
   }
 
+  /* conta rápida: quanto preciso na 3ª etapa */
+  function updateQ3() {
+    const out = $('#q3-out');
+    if (!out) return;
+    const T = S.rules.pass;
+    const a = readGrade($('#q3-a').value), b = readGrade($('#q3-b').value);
+    setInvalid($('#q3-a'), !!a.err);
+    setInvalid($('#q3-b'), !!b.err);
+    let html;
+    if (a.err || b.err) html = '<span class="err-inline">' + (a.err || b.err) + '</span>';
+    else if (a.v == null && b.v == null) html = 'Coloca a média da 1ª e da 2ª etapa que o site mostra quanto você precisa na 3ª.';
+    else if (a.v == null || b.v == null) {
+      const known = a.v != null ? a.v : b.v;
+      const x = (7 * T - 2 * known) / 5;
+      html = x <= EPS ? 'Você já passou, mesmo com 0 no que falta.'
+        : x > 10 + EPS ? 'Nem com 10 nas duas etapas que faltam dá pra chegar em ' + fmt(T) + '.'
+        : 'Você precisa de <b>' + fmt(up1(x), 1) + '</b> de média na ' + (a.v == null ? '1ª' : '2ª') + ' e na 3ª etapa.<small>Supondo a mesma nota nas duas. Coloca a outra média pra ver só a da 3ª.</small>';
+    } else {
+      const x = (7 * T - 2 * a.v - 2 * b.v) / 3;
+      if (x <= EPS) html = '🎉 Você já passou! Mesmo com 0 na 3ª etapa, a média fica ' + fmt((2 * a.v + 2 * b.v) / 7) + '.';
+      else if (x > 10 + EPS) html = 'Nem com 10 na 3ª etapa dá: a média chega no máximo em ' + fmt((2 * a.v + 2 * b.v + 30) / 7) + '. Aí vai pra recuperação final.<small>Na aba Recuperação dá pra ver quanto precisa lá.</small>';
+      else {
+        const n = up1(x);
+        html = 'Você precisa de <b>' + fmt(n, 1) + '</b> de média na 3ª etapa.<small>(' + fmt(a.v) + ' × 2 + ' + fmt(b.v) + ' × 2 + ' + fmt(n, 1) + ' × 3) ÷ 7 = ' + fmt((2 * a.v + 2 * b.v + 3 * n) / 7) + '</small>';
+      }
+    }
+    out.innerHTML = html;
+  }
+
   /* ---------- aba da IA ---------- */
   function buildPrompt() {
     const T = fmt(S.rules.pass);
@@ -2100,6 +2202,7 @@ a.btn { text-decoration: none; }
 
   renderMain();
   $('#panel-ia').addEventListener('change', updatePrompt);
+  $('#panel-boletim').addEventListener('input', function (ev) { if (ev.target.id === 'q3-a' || ev.target.id === 'q3-b') updateQ3(); });
   const startTab = location.hash.slice(1);
   if (startTab === 'recuperacao' || startTab === 'ia') showTab(startTab);
 })();
