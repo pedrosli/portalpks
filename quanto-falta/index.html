@@ -569,6 +569,12 @@ dialog.sheet[open] { animation: sheet-grow .24s cubic-bezier(.2, .9, .3, 1.15) b
 .grade--calc { display: inline-grid; place-items: center; min-height: 2.9rem; background: var(--card-2); border-style: dashed; }
 .grade--calc small { display: block; font: 700 .66rem/1 var(--f-body); color: var(--ink-faint); letter-spacing: .04em; text-transform: uppercase; }
 .grade__max { color: var(--ink-faint); font-weight: 800; }
+.grade--avg:placeholder-shown { border-style: dashed; background: var(--card-2); }
+.grade--avg:placeholder-shown::placeholder { color: var(--ink); opacity: 1; }
+.grade--avg:not(:placeholder-shown) { border-color: var(--pen); color: var(--pen); }
+.grade--bonus { width: 4.2rem; font-size: 1.25rem; }
+.etapa__note { font-size: .9rem; color: var(--ink-soft); }
+.etapa__note b { color: var(--ink); }
 .tag {
   display: inline-flex; align-items: baseline; flex-wrap: wrap; gap: 4px;
   padding: 4px 12px;
@@ -1034,13 +1040,13 @@ a.btn { text-decoration: none; }
   const PENDING = ['tranquilo', 'caminho', 'atencao', 'corre'];
 
   /* ---------- estado ---------- */
-  const E = (at1, at2, apa) => ({ at1: at1 || '', at2: at2 || '', apa: apa || '', v: '', direct: false, rec: '' });
+  const E = (at1, at2, apa) => ({ at1: at1 || '', at2: at2 || '', apa: apa || '', v: '', bonus: '', rec: '' });
   const blankEtapa = () => E();
   function newSubject(name, emoji, color, scheme) { return { id: uid(), name: name, emoji: emoji, color: color, scheme: SCHEMES[scheme] ? scheme : defaultScheme(name), etapas: [0, 1, 2].map(blankEtapa), recFinal: '' }; }
 
   function defaultState() {
     const subjects = SUBJECTS.map((row, idx) => newSubject(row[0], row[1], idx % 8, row[2]));
-    return { v: 1, listV: 2, rules: Object.assign({}, BASE_RULES), subjects: subjects };
+    return { v: 1, listV: 2, dataV: 3, rules: Object.assign({}, BASE_RULES), subjects: subjects };
   }
 
   function normalize(s) {
@@ -1057,13 +1063,13 @@ a.btn { text-decoration: none; }
         recFinal: str(x.recFinal),
         etapas: [0, 1, 2].map(function (i) {
           const e = (x.etapas || [])[i] || {};
-          return { at1: str(e.at1), at2: str(e.at2), apa: str(e.apa), v: str(e.v), direct: !!e.direct, rec: i < 2 ? str(e.rec) : '' };
+          return { at1: str(e.at1), at2: str(e.at2), apa: str(e.apa), v: s.dataV === 3 || e.direct ? str(e.v) : '', bonus: str(e.bonus), rec: i < 2 ? str(e.rec) : '' };
         })
       };
     });
-    const blank = (x) => !x.recFinal.trim() && x.etapas.every((e) => ![e.at1, e.at2, e.apa, e.v, e.rec].some((v) => v.trim()));
+    const blank = (x) => !x.recFinal.trim() && x.etapas.every((e) => ![e.at1, e.at2, e.apa, e.v, e.bonus, e.rec].some((v) => v.trim()));
     const list = s.listV === 2 ? subjects : subjects.filter((x) => !(isTrilha(x.name) && blank(x)));
-    return { v: 1, listV: 2, rules: r, subjects: list };
+    return { v: 1, listV: 2, dataV: 3, rules: r, subjects: list };
   }
   function load() {
     try {
@@ -1092,24 +1098,39 @@ a.btn { text-decoration: none; }
     const base = ETAPA_W[i] / W_SUM;
     const sc = schemeOf(sub);
     const PS = sum(sc.acts.map((a) => a.p));
-    const out = { i: i, slots: [], errs: {}, direct: !!et.direct, PS: PS };
-    if (et.direct) {
-      const g = readGrade(et.v);
-      if (g.err) out.errs.v = g.err;
-      out.slots.push({ i: i, k: 'v', c: base, m: 10, v: g.v, p: PS });
-    } else {
-      sc.acts.forEach(function (a) {
-        const g = readGrade(et[a.k]);
-        if (g.err) out.errs[a.k] = g.err;
-        out.slots.push({ i: i, k: a.k, c: base * a.p / PS, m: 10, v: g.v, p: a.p });
-      });
-    }
+    const out = { i: i, slots: [], errs: {}, PS: PS, bonus: 0 };
+    // conta pelas atividades (sempre calculada, pra mostrar como referência)
+    const actSlots = sc.acts.map(function (a) {
+      const g = readGrade(et[a.k]);
+      if (g.err) out.errs[a.k] = g.err;
+      return { i: i, k: a.k, c: base * a.p / PS, m: 10, v: g.v, p: a.p };
+    });
+    const ak = actSlots.filter((x) => x.v != null);
+    const akp = sum(ak.map((x) => x.p));
+    out.calcKnown = ak.length === actSlots.length;
+    out.calcValue = out.calcKnown ? sum(actSlots.map((x) => x.p * x.v)) / PS : null;
+    out.calcPartial = akp > 0 ? sum(ak.map((x) => x.p * x.v)) / akp : null;
+    // média digitada à mão vale no lugar da conta
+    const ov = readGrade(et.v);
+    if (ov.err) out.errs.v = ov.err;
+    out.override = ov.v != null;
+    out.slots = out.override ? [{ i: i, k: 'v', c: base, m: 10, v: ov.v, p: PS }] : actSlots;
     const kn = out.slots.filter((x) => x.v != null);
     out.known = kn.length === out.slots.length;
     out.anyKnown = kn.length > 0;
     const kp = sum(kn.map((x) => x.p));
     out.partial = kp > 0 ? sum(kn.map((x) => x.p * x.v)) / kp : null;
     out.value = out.known ? sum(out.slots.map((x) => x.p * x.v)) / PS : null;
+    // bônus: soma direto na média da etapa (0,3 de bônus = +0,3), sem passar de 10
+    const bg = readGrade(et.bonus);
+    if (bg.err) out.errs.bonus = bg.err;
+    out.bonusRaw = bg.v || 0;
+    if (bg.v != null && bg.v > 0) {
+      const b = out.known ? Math.min(bg.v, 10 - out.value) : bg.v;
+      out.bonus = Math.max(0, b);
+      out.slots.push({ i: i, k: 'bonus', c: base, m: 0, v: out.bonus, p: 0 });
+      if (out.known) out.value += out.bonus;
+    }
     out.pre = out.value;
     out.recV = null;
     // Recuperação da 1ª e 2ª etapa: (média da etapa + prova) ÷ 2
@@ -1228,7 +1249,7 @@ a.btn { text-decoration: none; }
   }
 
   function etapaVal(e) {
-    if (e.known) return fmt(e.value, 1);
+    if (e.known) return fmt(e.value, 1) + (e.bonus > 0 ? ' (+' + fmt(e.bonus) + ' bônus)' : '');
     if (e.anyKnown) return fmt(e.partial, 1) + '…';
     return '—';
   }
@@ -1275,7 +1296,8 @@ a.btn { text-decoration: none; }
     const others = Object.keys(groups).filter((k) => groups[k].length);
     const steps = [
       '<b>Média da etapa:</b> ' + (others.length ? 'na maioria das matérias, ' : '') + 'At1 e At2 têm peso 4 e a APA tem peso 2: multiplica cada nota pelo peso, soma e divide por 10.'
-        + others.map((k) => ' Em ' + joinPt(groups[k]) + ', é ' + SCHEMES[k].formula + '.').join(''),
+        + others.map((k) => ' Em ' + joinPt(groups[k]) + ', é ' + SCHEMES[k].formula + '.').join('')
+        + ' Se tiver bônus, ele soma direto na média da etapa (0,3 de bônus = +0,3).',
       '<b>Média final:</b> a 1ª e a 2ª etapa têm peso 2, e a 3ª tem peso 3. Multiplica cada média pelo peso, soma e divide por 7.',
       '<b>Quanto falta:</b> o site vê quanto da média final você já garantiu, quanto falta pra chegar em ' + fmt(T) + ' e quanto ainda dá pra ganhar. Dividindo um pelo outro, sai a nota que você precisa em tudo que falta.'
     ];
@@ -1297,7 +1319,7 @@ a.btn { text-decoration: none; }
 
   function renderMain() {
     $('#rulesSummary').textContent = rulesSummary();
-    $('#sampleNote').hidden = S.subjects.some((s) => s.etapas.some((e) => (e.direct ? [e.v] : [e.at1, e.at2, e.apa]).some((x) => x.trim())));
+    $('#sampleNote').hidden = S.subjects.some((s) => s.etapas.some((e) => [e.v, e.at1, e.at2, e.apa, e.bonus].some((x) => x.trim())));
     const list = S.subjects.map((sub) => ({ sub: sub, a: analyze(sub) }));
     renderSummary(list);
     $('#grid').innerHTML = list.map((x) => cardHtml(x.sub, x.a)).join('')
@@ -1327,22 +1349,21 @@ a.btn { text-decoration: none; }
   /* ---------- folha da matéria ---------- */
   function etapaHtml(sub, i) {
     const et = sub.etapas[i];
-    const field = et.direct
-      ? '<label class="etapa__lbl" for="ev-' + i + '">média</label><input id="ev-' + i + '" class="grade" data-k="v" data-i="' + i + '" inputmode="decimal" autocomplete="off" placeholder="—" value="' + esc(et.v) + '" aria-label="Média da ' + ord(i) + ' etapa" aria-describedby="ee-' + i + '">'
-      : '<span class="etapa__lbl" aria-hidden="true">média</span><output class="grade grade--calc" id="ec-' + i + '" aria-label="Média da ' + ord(i) + ' etapa">—</output>';
     const sc = schemeOf(sub);
-    const body = et.direct
-      ? '<p class="err-inline" id="ee-' + i + '" hidden></p><button type="button" class="linkish" data-do="useActs" data-i="' + i + '">Calcular pela ' + joinPt(sc.acts.map((a) => a.n)) + '</button>'
-      : '<div class="acts3" style="--cols: ' + sc.acts.length + '">' + sc.acts.map((a) => '<div class="act3">'
-          + '<label class="act3__n" for="a-' + i + '-' + a.k + '">' + a.n + '<small>' + a.h + '</small></label>'
-          + '<input id="a-' + i + '-' + a.k + '" class="grade" data-k="' + a.k + '" data-i="' + i + '" inputmode="decimal" autocomplete="off" placeholder="—" value="' + esc(et[a.k]) + '" aria-label="' + a.n + ' da ' + ord(i) + ' etapa">'
-          + '<div class="act3__out" id="ao-' + i + '-' + a.k + '"></div></div>').join('') + '</div>'
-        + '<button type="button" class="linkish" data-do="useDirect" data-i="' + i + '">Só sei a média da etapa</button>';
+    const acts = '<div class="acts3" style="--cols: ' + sc.acts.length + '">' + sc.acts.map((a) => '<div class="act3">'
+      + '<label class="act3__n" for="a-' + i + '-' + a.k + '">' + a.n + '<small>' + a.h + '</small></label>'
+      + '<input id="a-' + i + '-' + a.k + '" class="grade" data-k="' + a.k + '" data-i="' + i + '" inputmode="decimal" autocomplete="off" placeholder="—" value="' + esc(et[a.k]) + '" aria-label="' + a.n + ' da ' + ord(i) + ' etapa">'
+      + '<div class="act3__out" id="ao-' + i + '-' + a.k + '"></div></div>').join('') + '</div>';
     return '<div class="etapa">'
       + '<div class="etapa__row"><div class="etapa__name">' + ord(i) + ' etapa<small>peso ' + ETAPA_W[i] + ' na média final</small></div>'
-      + '<div class="etapa__field">' + field + '<span class="grade__max">/10</span></div>'
+      + '<div class="etapa__field"><label class="etapa__lbl" for="ev-' + i + '">média</label>'
+      + '<input id="ev-' + i + '" class="grade grade--avg" data-k="v" data-i="' + i + '" inputmode="decimal" autocomplete="off" placeholder="—" value="' + esc(et.v) + '" aria-label="Média da ' + ord(i) + ' etapa (calculada, ou digite a sua)" aria-describedby="en-' + i + '">'
+      + '<span class="grade__max">/10</span></div>'
+      + '<div class="etapa__field"><label class="etapa__lbl" for="eb-' + i + '">bônus</label><span class="grade__max" aria-hidden="true">+</span>'
+      + '<input id="eb-' + i + '" class="grade grade--bonus" data-k="bonus" data-i="' + i + '" inputmode="decimal" autocomplete="off" placeholder="0" value="' + esc(et.bonus) + '" aria-label="Bônus da ' + ord(i) + ' etapa"></div>'
       + '<div class="etapa__out" id="eo-' + i + '"></div></div>'
-      + body + '</div>';
+      + '<p class="etapa__note" id="en-' + i + '" hidden></p>'
+      + acts + '</div>';
   }
   function etapasHtml(sub) { let h = ''; for (let i = 0; i < N; i++) h += etapaHtml(sub, i); return h; }
 
@@ -1362,6 +1383,7 @@ a.btn { text-decoration: none; }
       + '<div class="colors">' + [0, 1, 2, 3, 4, 5, 6, 7].map((c) => '<button type="button" data-color="' + c + '" style="--c: var(--s' + c + ')" aria-pressed="' + (c === sub.color) + '" aria-label="Cor ' + (c + 1) + '"></button>').join('') + '</div></div>'
       + '<section class="block" id="d-verdict" aria-live="polite"></section>'
       + '<section class="block"><h3 class="block__t">Notas de cada etapa<small>de 0 a 10 · deixe em branco o que ainda não aconteceu</small></h3>'
+      + '<p class="hint">A média de cada etapa sai da conta das atividades, mas dá pra digitar outra no quadradinho de média. O bônus soma direto na média.</p>'
       + '<div class="scheme" role="radiogroup" aria-label="Como é a média da etapa nessa matéria"><span class="scheme__lbl">Média da etapa</span>'
       + Object.keys(SCHEMES).map((k) => '<label class="scheme__o"><input type="radio" name="d-scheme" id="d-sc-' + k + '" value="' + k + '"' + (schemeOf(sub) === SCHEMES[k] ? ' checked' : '') + '><span>' + SCHEMES[k].formula + '</span></label>').join('')
       + '</div><div id="d-etapas">' + etapasHtml(sub) + '</div></section>'
@@ -1414,32 +1436,30 @@ a.btn { text-decoration: none; }
       const out = $('#eo-' + e.i, dlg);
       if (!out) return;
       let tag = '';
-      if (e.direct) {
-        setInvalid($('#ev-' + e.i, dlg), !!e.errs.v);
-        const ee = $('#ee-' + e.i, dlg);
-        ee.hidden = !e.errs.v;
-        ee.textContent = e.errs.v || '';
-        if (!e.known && !e.errs.v) {
-          if (a.ff != null) tag = '<span class="tag">precisa de <b>' + fmt(up1(a.ff * 10), 1) + '</b></span>';
-          else if (a.st === 'rec' && a.Rem > EPS) tag = '<span class="tag">dá o máximo 💪</span>';
-        }
-      } else {
-        const calc = $('#ec-' + e.i, dlg);
-        if (e.known) calc.innerHTML = fmt(e.pre);
-        else if (e.anyKnown) calc.innerHTML = fmt(e.partial, 1) + '<small>parcial</small>';
-        else calc.textContent = '—';
-        if (!e.known) {
-          if (a.ff != null) tag = '<span class="tag">precisa fechar com <b>' + fmt(up1(etapaTarget(a, e)), 1) + '</b></span>';
-          else if (a.st === 'rec' && a.Rem > EPS) tag = '<span class="tag">dá o máximo 💪</span>';
-        }
-        schemeOf(sub).acts.forEach(function (ac) {
-          const err = e.errs[ac.k];
-          setInvalid($('#a-' + e.i + '-' + ac.k, dlg), !!err);
-          const ao = $('#ao-' + e.i + '-' + ac.k, dlg);
-          const slot = e.slots.find((x) => x.k === ac.k);
-          ao.innerHTML = err ? '<span class="err-inline">' + esc(err) + '</span>' : (slot.v == null ? needMini(a) : '');
-        });
+      const inp = $('#ev-' + e.i, dlg);
+      inp.placeholder = e.calcKnown ? fmt(e.calcValue) : e.calcPartial != null ? fmt(e.calcPartial, 1) : '—';
+      setInvalid(inp, !!e.errs.v);
+      setInvalid($('#eb-' + e.i, dlg), !!e.errs.bonus);
+      const notes = [];
+      if (e.errs.v) notes.push('<span class="err-inline">Média: ' + esc(e.errs.v) + '</span>');
+      if (e.errs.bonus) notes.push('<span class="err-inline">Bônus: ' + esc(e.errs.bonus) + '</span>');
+      if (e.override) notes.push('Média digitada por você' + (e.calcKnown ? ' (pela conta das atividades daria ' + fmt(e.calcValue) + ')' : '') + '. <button type="button" class="linkish" data-do="clearOv" data-i="' + e.i + '">Usar a conta das atividades</button>');
+      else if (!e.calcKnown && e.calcPartial != null) notes.push('Média parcial, com as notas que já saíram: ' + fmt(e.calcPartial, 1) + '.');
+      if (e.bonusRaw > 0) notes.push(!e.known ? 'O bônus de +' + fmt(e.bonusRaw) + ' já entra na conta.' : e.bonusRaw > e.bonus + EPS ? 'Com o bônus, a etapa bate <b>10</b>, que é o máximo.' : 'Com o bônus de +' + fmt(e.bonus) + ', a etapa fica com <b>' + fmt(e.pre) + '</b>.');
+      const note = $('#en-' + e.i, dlg);
+      note.hidden = !notes.length;
+      note.innerHTML = notes.join(' ');
+      if (!e.known) {
+        if (a.ff != null) tag = '<span class="tag">precisa fechar com <b>' + fmt(up1(etapaTarget(a, e)), 1) + '</b></span>';
+        else if (a.st === 'rec' && a.Rem > EPS) tag = '<span class="tag">dá o máximo 💪</span>';
       }
+      schemeOf(sub).acts.forEach(function (ac) {
+        const err = e.errs[ac.k];
+        setInvalid($('#a-' + e.i + '-' + ac.k, dlg), !!err);
+        const ao = $('#ao-' + e.i + '-' + ac.k, dlg);
+        const slot = e.slots.find((x) => x.k === ac.k);
+        ao.innerHTML = err ? '<span class="err-inline">' + esc(err) + '</span>' : (slot && slot.v == null ? needMini(a) : '');
+      });
       if (e.known) {
         if (e.recV != null) tag = '<span class="tag tag--rec">pós recuperação: <b>' + fmt(e.value) + '</b></span>';
         else if (e.i < 2 && e.pre < S.rules.pass - EPS) tag = '<button type="button" class="tag tag--btn" data-do="goRec" data-i="' + e.i + '">fazer a conta da recuperação ›</button>';
@@ -1468,7 +1488,7 @@ a.btn { text-decoration: none; }
   }
 
   function howCalcHtml(a, sub) {
-    const parts = ['A 1ª e a 2ª etapa valem 2/7 da média final cada, e a 3ª vale 3/7. ' + schemeOf(sub).how];
+    const parts = ['A 1ª e a 2ª etapa valem 2/7 da média final cada, e a 3ª vale 3/7. ' + schemeOf(sub).how + ' O bônus soma direto na média da etapa.'];
     if (a.Kmax > EPS) parts.push('Com as notas que você já tem, sua média final já juntou <b>' + fmt(a.K) + '</b> dos <b>' + fmt(a.T) + '</b> que precisa.');
     if (a.ff != null && a.Kmax > EPS) {
       parts.push('Faltam <b>' + fmt(a.need) + '</b>. Tudo que ainda falta fazer pode render até <b>' + fmt(a.Rem) + '</b> na média.');
@@ -1498,7 +1518,7 @@ a.btn { text-decoration: none; }
     const d = draft;
     $('#rulesDlg').innerHTML = '<header class="sheet__head"><h2 id="r-title">Regras do Mackenzie</h2><button type="button" class="x" data-do="close" aria-label="Fechar">×</button></header>'
       + '<div class="sheet__main">'
-      + '<div class="fixed"><p>3 etapas <span>com peso 2, 2 e 3 na média final</span></p><p>At1 e At2 <span>com peso 4, e a</span> APA <span>com peso 2, na maioria das matérias</span></p><p>(At2 + APA) ÷ 2 <span>ou</span> (At1 + APA) ÷ 2 <span>nas matérias que só têm duas atividades. Dá pra trocar dentro de cada matéria.</span></p><p>Recuperação de etapa <span>(1ª e 2ª): (média da etapa + prova) ÷ 2</span></p><p>Recuperação final <span>precisa de 6 + o que faltou pra média 6</span></p></div>'
+      + '<div class="fixed"><p>3 etapas <span>com peso 2, 2 e 3 na média final</span></p><p>At1 e At2 <span>com peso 4, e a</span> APA <span>com peso 2, na maioria das matérias</span></p><p>(At2 + APA) ÷ 2 <span>ou</span> (At1 + APA) ÷ 2 <span>nas matérias que só têm duas atividades. Dá pra trocar dentro de cada matéria.</span></p><p>Bônus <span>soma direto na média da etapa: 0,3 de bônus = +0,3</span></p><p>Recuperação de etapa <span>(1ª e 2ª): (média da etapa + prova) ÷ 2</span></p><p>Recuperação final <span>precisa de 6 + o que faltou pra média 6</span></p></div>'
       + '<div class="field"><label class="lbl" for="r-pass">Média pra passar</label><input class="num" id="r-pass" inputmode="decimal" autocomplete="off" value="' + esc(d.pass) + '"><p class="hint">Se a média mínima da sua série for outra, é só trocar aqui.</p></div>'
       + '<p class="form-err" id="r-err" role="alert" hidden></p>'
       + '</div>'
@@ -1685,14 +1705,9 @@ a.btn { text-decoration: none; }
         t.setAttribute('aria-expanded', String(!p.hidden));
         break;
       }
-      case 'useActs':
+      case 'clearOv':
         if (!sub) break;
-        sub.etapas[i].direct = false;
-        userEdited = true; save(); rerenderEtapas('#a-' + i + '-' + schemeOf(sub).acts[0].k); renderMain();
-        break;
-      case 'useDirect':
-        if (!sub) break;
-        sub.etapas[i].direct = true;
+        sub.etapas[i].v = '';
         userEdited = true; save(); rerenderEtapas('#ev-' + i); renderMain();
         break;
       case 'askDel': $('#d-delc').hidden = false; t.hidden = true; break;
@@ -1717,7 +1732,7 @@ a.btn { text-decoration: none; }
     const k = t.dataset.k;
     if (!k) return;
     if (k === 'name') sub.name = t.value;
-    else if (['v', 'at1', 'at2', 'apa'].indexOf(k) >= 0) sub.etapas[+t.dataset.i][k] = t.value;
+    else if (['v', 'bonus', 'at1', 'at2', 'apa'].indexOf(k) >= 0) sub.etapas[+t.dataset.i][k] = t.value;
     else return;
     userEdited = k !== 'name';
     save();
@@ -1985,6 +2000,7 @@ a.btn { text-decoration: none; }
       at1.length ? '- Em ' + joinPt(at1) + ': (At1 + APA) ÷ 2.' : '',
       at2.length ? '- Nas trilhas (' + joinPt(at2) + '): (At2 + APA) ÷ 2.' : '',
       '- As notas vão de 0 a 10. Pra passar, a média final tem que ser pelo menos ' + T + '.',
+      '- Bônus (bonificação) soma direto na média da etapa: 0,3 de bônus = +0,3 na média. A média da etapa não passa de 10.',
       '- Recuperação da 1ª e da 2ª etapa: média pós recuperação = (média da etapa + nota da prova) ÷ 2. Ela entra no lugar da média da etapa.',
       '- Recuperação final: precisa tirar ' + T + ' + o que faltou pra média final chegar em ' + T + '. Exemplo: média final ' + fmt(S.rules.pass - 0.8) + ' → precisa de ' + fmt(S.rules.pass + 0.8) + '.',
       '',
