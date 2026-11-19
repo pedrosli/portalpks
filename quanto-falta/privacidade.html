@@ -1,0 +1,90 @@
+<!doctype html>
+<html lang="pt-BR">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>Privacidade · Quanto Falta pra Passar?</title>
+<meta name="description" content="Como o Quanto Falta pra Passar? trata suas notas, a contagem de visitas e os anúncios.">
+<link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'%3E%3Ctext y='.9em' font-size='88'%3E%E2%9C%8F%EF%B8%8F%3C/text%3E%3C/svg%3E">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Baloo+2:wght@700;800&family=Nunito:wght@400;600;700;800&display=swap">
+<style>
+  :root {
+    --paper: #F4F7FC; --grid: rgba(66, 112, 200, .12); --card: #FFFFFF; --edge: #1C2847; --hard: #1C2847;
+    --ink: #1C2847; --ink-soft: #55617E; --pen: #2D58E6; --hl: #FFE14D; --hl-ink: #3B3100;
+    color-scheme: light;
+  }
+  @media (prefers-color-scheme: dark) {
+    :root {
+      --paper: #1B2926; --grid: rgba(214, 236, 226, .07); --card: #22332F; --edge: #4A645D; --hard: #0C1412;
+      --ink: #EEF4EF; --ink-soft: #B2C2BC; --pen: #93B4FF; --hl: #EBD35C; --hl-ink: #2A2300;
+      color-scheme: dark;
+    }
+  }
+  * { box-sizing: border-box; }
+  body {
+    margin: 0;
+    background-color: var(--paper);
+    background-image: linear-gradient(var(--grid) 1px, transparent 1px), linear-gradient(90deg, var(--grid) 1px, transparent 1px);
+    background-size: 22px 22px;
+    color: var(--ink);
+    font: 16px/1.6 "Nunito", ui-rounded, system-ui, sans-serif;
+  }
+  main {
+    max-width: 42rem;
+    margin: 0 auto;
+    padding-block: 32px 56px;
+    padding-left: max(16px, env(safe-area-inset-left, 0px));
+    padding-right: max(16px, env(safe-area-inset-right, 0px));
+    display: grid; gap: 18px;
+  }
+  a { color: var(--pen); font-weight: 700; }
+  .back { justify-self: start; }
+  h1 { margin: 0; font: 800 clamp(2rem, 6vw, 2.6rem)/1.05 "Baloo 2", "Nunito", system-ui, sans-serif; text-wrap: balance; }
+  h1 mark { color: var(--hl-ink); background: var(--hl); padding: 0 .12em; border-radius: .2em; }
+  section {
+    padding: 16px 20px;
+    border-radius: 16px;
+    background: var(--card);
+    border: 2px solid var(--edge);
+    box-shadow: 4px 4px 0 var(--hard);
+  }
+  h2 { margin: 0 0 6px; font: 800 1.25rem/1.2 "Baloo 2", "Nunito", system-ui, sans-serif; }
+  p { margin: 0; color: var(--ink-soft); }
+  p + p { margin-top: 8px; }
+  .updated { font-size: .9rem; color: var(--ink-soft); }
+</style>
+</head>
+<body>
+<main>
+  <a class="back" href="/">← Voltar pra calculadora</a>
+  <h1><mark>Privacidade</mark> no Quanto Falta?</h1>
+  <p>O Quanto Falta? é uma calculadora de notas feita por aluno, pra aluno. Não é um site oficial do Mackenzie.</p>
+
+  <section>
+    <h2>Suas notas</h2>
+    <p>As notas que você coloca ficam guardadas só no navegador do seu aparelho. O site não tem servidor que receba suas notas, então ninguém consegue ver, nem quem fez o site.</p>
+    <p>Pra apagar, use o botão "Apagar todas as notas" ou limpe os dados do navegador.</p>
+  </section>
+
+  <section>
+    <h2>Contagem de visitas</h2>
+    <p>Usamos o Vercel Web Analytics pra contar visitas de forma anônima e sem cookies: quantas pessoas entraram, de que país, se foi pelo celular ou computador e de que site veio o acesso.</p>
+  </section>
+
+  <section>
+    <h2>Anúncios</h2>
+    <p>O site mostra anúncios do Google AdSense. O Google e os parceiros dele podem usar cookies pra mostrar anúncios com base nas suas visitas a este e a outros sites.</p>
+    <p>Você pode desligar os anúncios personalizados nas <a href="https://adssettings.google.com" target="_blank" rel="noopener">configurações de anúncios do Google</a> e saber mais em <a href="https://policies.google.com/technologies/ads?hl=pt-BR" target="_blank" rel="noopener">Como o Google usa cookies em anúncios</a>.</p>
+  </section>
+
+  <section>
+    <h2>Aba "Usar IA"</h2>
+    <p>Essa aba só monta um texto pra você copiar. Se você colar esse texto e o print das suas notas no ChatGPT, no Claude ou no Gemini, o que você mandar lá segue as regras de privacidade desses serviços.</p>
+  </section>
+
+  <p class="updated">Atualizado em 4 de novembro de 2026.</p>
+</main>
+</body>
+</html>
