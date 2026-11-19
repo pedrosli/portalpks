@@ -10,11 +10,11 @@ export default function Home() {
       />
       <KeyIcon
         aria-hidden
-        className="pointer-events-none absolute -left-10 top-24 h-56 w-56 -rotate-12 text-violet-200/60"
+        className="pointer-events-none absolute -left-10 top-24 h-56 w-56 -rotate-12 text-violet-200/60 dark:text-violet-500/15"
       />
       <KeyIcon
         aria-hidden
-        className="pointer-events-none absolute -right-16 bottom-10 h-72 w-72 rotate-[18deg] text-purple-200/50"
+        className="pointer-events-none absolute -right-16 bottom-10 h-72 w-72 rotate-[18deg] text-purple-200/50 dark:text-purple-500/15"
       />
 
       <div className="card relative flex w-full max-w-md flex-col items-center gap-6 px-8 py-12 text-center">
